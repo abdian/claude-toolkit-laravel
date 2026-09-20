@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800">
+  <defs>
+    <radialGradient id="warm5" cx="22%" cy="10%" r="100%">
+      <stop offset="0" stop-color="#241E18"/>
+      <stop offset="1" stop-color="#110E0B"/>
+    </radialGradient>
+    <filter id="grain5">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.04"/></feComponentTransfer>
+    </filter>
+    <marker id="am" markerWidth="8" markerHeight="8" refX="6.5" refY="2.8" orient="auto">
+      <path d="M0,0 L6.5,2.8 L0,5.6 z" fill="#5E554A"/>
+    </marker>
+    <marker id="amr" markerWidth="8" markerHeight="8" refX="6.5" refY="2.8" orient="auto">
+      <path d="M0,0 L6.5,2.8 L0,5.6 z" fill="#E24E3A"/>
+    </marker>
+  </defs>
+
+  <rect width="1280" height="800" fill="url(#warm5)"/>
+  <rect width="1280" height="800" filter="url(#grain5)" opacity="0.6"/>
+  <line x1="92" y1="0" x2="92" y2="800" stroke="#2E2720" stroke-width="1"/>
+
+  <text x="124" y="76" font-family="Georgia,serif" font-size="38" font-weight="bold" fill="#F1EADD">Seven phases. Two kinds of “required.”</text>
+  <text x="124" y="110" font-family="Consolas,monospace" font-size="14.5" fill="#8C8071">Nothing blocks you. Solid boxes earn their place; dashed ones you skip on purpose.</text>
+
+  <g stroke="#5E554A" stroke-width="1.3" marker-end="url(#am)">
+    <line x1="264" y1="222" x2="286" y2="222"/>
+    <line x1="422" y1="222" x2="444" y2="222"/>
+    <line x1="580" y1="222" x2="602" y2="222"/>
+    <line x1="738" y1="222" x2="760" y2="222"/>
+    <line x1="896" y1="222" x2="918" y2="222"/>
+    <line x1="1054" y1="222" x2="1076" y2="222"/>
+  </g>
+
+  <!-- 1 Idea -->
+  <rect x="124" y="170" width="140" height="104" rx="4" fill="none" stroke="#3A322A" stroke-dasharray="4 4"/>
+  <text x="194" y="200" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#8C8071" text-anchor="middle">Idea</text>
+  <text x="194" y="228" font-family="Consolas,monospace" font-size="11.5" fill="#6A6153" text-anchor="middle">no tool —</text>
+  <text x="194" y="245" font-family="Consolas,monospace" font-size="11.5" fill="#6A6153" text-anchor="middle">this part is you</text>
+
+  <!-- 2 Specs -->
+  <rect x="282" y="170" width="140" height="104" rx="4" fill="#1B1611" stroke="#5E554A"/>
+  <text x="352" y="200" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#F1EADD" text-anchor="middle">Specs</text>
+  <text x="352" y="226" font-family="Consolas,monospace" font-size="11.5" fill="#C6BCAB" text-anchor="middle">/spec-import</text>
+  <text x="352" y="243" font-family="Consolas,monospace" font-size="11.5" fill="#6A6153" text-anchor="middle">specs/HOWTO.md</text>
+  <text x="352" y="264" font-family="Consolas,monospace" font-size="11" fill="#E2A03A" text-anchor="middle">tier 3 only</text>
+
+  <!-- 3 Brief -->
+  <rect x="440" y="170" width="140" height="104" rx="4" fill="#1B1611" stroke="#5E554A"/>
+  <text x="510" y="200" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#F1EADD" text-anchor="middle">Brief</text>
+  <text x="510" y="226" font-family="Consolas,monospace" font-size="11.5" fill="#C6BCAB" text-anchor="middle">/brief · /edges</text>
+  <text x="510" y="243" font-family="Consolas,monospace" font-size="11.5" fill="#6A6153" text-anchor="middle">done-when, written</text>
+  <text x="510" y="264" font-family="Consolas,monospace" font-size="11" fill="#5FAE7F" text-anchor="middle">every feature</text>
+
+  <!-- 4 Plan — the gate -->
+  <rect x="598" y="162" width="140" height="120" rx="4" fill="#211710" stroke="#E24E3A" stroke-width="2"/>
+  <text x="668" y="194" font-family="Georgia,serif" font-size="20" font-weight="bold" fill="#E24E3A" text-anchor="middle">Plan</text>
+  <text x="668" y="220" font-family="Consolas,monospace" font-size="11.5" fill="#C6BCAB" text-anchor="middle">/plan-check</text>
+  <text x="668" y="238" font-family="Consolas,monospace" font-size="11.5" fill="#8C8071" text-anchor="middle">GO / TRIM / RETHINK</text>
+  <line x1="620" y1="252" x2="716" y2="252" stroke="#5A3128" stroke-width="1"/>
+  <text x="668" y="270" font-family="Georgia,serif" font-size="12.5" font-style="italic" fill="#E24E3A" text-anchor="middle">the cheap gate</text>
+
+  <!-- 5 Code -->
+  <rect x="756" y="170" width="140" height="104" rx="4" fill="#1B1611" stroke="#5E554A"/>
+  <text x="826" y="200" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#F1EADD" text-anchor="middle">Code</text>
+  <text x="826" y="226" font-family="Consolas,monospace" font-size="11.5" fill="#C6BCAB" text-anchor="middle">/lazy · the ladder</text>
+  <text x="826" y="243" font-family="Consolas,monospace" font-size="11.5" fill="#6A6153" text-anchor="middle">CLAUDE.md rules</text>
+  <text x="826" y="264" font-family="Consolas,monospace" font-size="11" fill="#6A6153" text-anchor="middle">the actual work</text>
+
+  <!-- 6 Audit -->
+  <rect x="914" y="170" width="140" height="104" rx="4" fill="none" stroke="#3A322A" stroke-dasharray="4 4"/>
+  <text x="984" y="200" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#C6BCAB" text-anchor="middle">Audit</text>
+  <text x="984" y="226" font-family="Consolas,monospace" font-size="11.5" fill="#8C8071" text-anchor="middle">/audit-codebase</text>
+  <text x="984" y="243" font-family="Consolas,monospace" font-size="11" fill="#6A6153" text-anchor="middle">/find-overengineering</text>
+  <text x="984" y="264" font-family="Consolas,monospace" font-size="11" fill="#6A6153" text-anchor="middle">every few weeks</text>
+
+  <!-- 7 Fix -->
+  <rect x="1072" y="170" width="140" height="104" rx="4" fill="#1B1611" stroke="#5E554A"/>
+  <text x="1142" y="200" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#F1EADD" text-anchor="middle">Fix</text>
+  <text x="1142" y="226" font-family="Consolas,monospace" font-size="11.5" fill="#C6BCAB" text-anchor="middle">/fix-one</text>
+  <text x="1142" y="243" font-family="Consolas,monospace" font-size="11.5" fill="#6A6153" text-anchor="middle">one finding, one PR</text>
+  <text x="1142" y="264" font-family="Consolas,monospace" font-size="11" fill="#E24E3A" text-anchor="middle">if you audited</text>
+
+  <path d="M1142 278 L1142 310 L984 310 L984 280" fill="none" stroke="#E24E3A" stroke-width="1.3"
+        stroke-dasharray="4 4" marker-end="url(#amr)"/>
+  <text x="1063" y="329" font-family="Georgia,serif" font-size="13" font-style="italic" fill="#E24E3A" text-anchor="middle">until the report is empty</text>
+
+  <!-- hard dependencies -->
+  <line x1="124" y1="372" x2="1212" y2="372" stroke="#3A322A" stroke-width="1"/>
+  <text x="124" y="408" font-family="Georgia,serif" font-size="24" font-weight="bold" fill="#F1EADD">Hard dependencies</text>
+  <text x="352" y="408" font-family="Consolas,monospace" font-size="13.5" fill="#8C8071">— these genuinely cannot do their job without an input</text>
+
+  <g font-family="Consolas,monospace" font-size="13.5">
+    <text x="124" y="452" fill="#E24E3A">/plan-check</text>
+    <text x="244" y="452" fill="#6A6153">needs</text>
+    <text x="304" y="452" fill="#F1EADD">BRIEF.md</text>
+    <text x="440" y="452" fill="#8C8071">with nothing to judge against, it can only agree with the plan</text>
+    <line x1="124" y1="470" x2="1212" y2="470" stroke="#241E18" stroke-width="1"/>
+
+    <text x="124" y="500" fill="#E24E3A">/plan-check</text>
+    <text x="244" y="500" fill="#6A6153">needs</text>
+    <text x="304" y="500" fill="#F1EADD">a fresh session</text>
+    <text x="500" y="500" fill="#8C8071">the session that wrote the plan is its lawyer, not its judge</text>
+    <line x1="124" y1="518" x2="1212" y2="518" stroke="#241E18" stroke-width="1"/>
+
+    <text x="124" y="548" fill="#E24E3A">/fix-one</text>
+    <text x="244" y="548" fill="#6A6153">needs</text>
+    <text x="304" y="548" fill="#F1EADD">a report + a number</text>
+    <text x="536" y="548" fill="#8C8071">it fixes finding #3 of AUDIT.md, not “the bug”</text>
+    <line x1="124" y1="566" x2="1212" y2="566" stroke="#241E18" stroke-width="1"/>
+
+    <text x="124" y="596" fill="#E24E3A">PERMISSIONS · PANELS</text>
+    <text x="376" y="596" fill="#6A6153">need</text>
+    <text x="432" y="596" fill="#F1EADD">GLOSSARY.md</text>
+    <text x="580" y="596" fill="#8C8071">written first, they carry names that later change under them</text>
+  </g>
+
+  <!-- tiers -->
+  <line x1="124" y1="642" x2="1212" y2="642" stroke="#3A322A" stroke-width="1"/>
+  <text x="124" y="678" font-family="Georgia,serif" font-size="24" font-weight="bold" fill="#F1EADD">How much you actually need</text>
+
+  <g font-family="Consolas,monospace" font-size="13.5">
+    <text x="124" y="714" font-family="Georgia,serif" font-size="17" font-weight="bold" fill="#5FAE7F">Tier 1</text>
+    <text x="216" y="714" fill="#6A6153">a script, under ~15 files</text>
+    <text x="516" y="714" fill="#C6BCAB">Brief only. No specs, no rules, no audit loop.</text>
+
+    <text x="124" y="746" font-family="Georgia,serif" font-size="17" font-weight="bold" fill="#E2A03A">Tier 2</text>
+    <text x="216" y="746" fill="#6A6153">weeks, ~15–60 files</text>
+    <text x="516" y="746" fill="#C6BCAB">Brief + Plan + a 20-line CLAUDE.md. Audit when it feels heavy.</text>
+
+    <text x="124" y="778" font-family="Georgia,serif" font-size="17" font-weight="bold" fill="#E24E3A">Tier 3</text>
+    <text x="216" y="778" fill="#6A6153">a product, 60+ files</text>
+    <text x="516" y="778" fill="#C6BCAB">All seven, plus the ctx-* engine. The only tier that needs specs/.</text>
+  </g>
+</svg>

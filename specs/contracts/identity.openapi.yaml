@@ -1,0 +1,211 @@
+openapi: 3.0.3
+info:
+  title: identity service
+  version: 0.1.0
+  description: >
+    هویت و دسترسی: ثبت‌نام، OTP، ورود، صدور JWT (RS256)، کاربران و نقش‌ها.
+    مرجع مجوزها: ../PERMISSIONS.md
+
+servers:
+  - url: http://identity.localhost/api
+
+security:
+  - bearerAuth: []
+
+paths:
+  /health:
+    get:
+      security: []
+      summary: Liveness check
+      responses:
+        "200":
+          description: OK
+
+  /.well-known/jwks.json:
+    get:
+      security: []
+      summary: Public keys for JWT verification (RS256)
+      responses:
+        "200":
+          description: JWKS document
+
+  /auth/register:
+    post:
+      security: []
+      summary: ثبت‌نام با موبایل — OTP از طریق سرویس notification ارسال می‌شود
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mobile]
+              properties:
+                mobile: { type: string, example: "09121234567" }
+      responses:
+        "202": { description: OTP queued }
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /auth/otp/verify:
+    post:
+      security: []
+      summary: تأیید OTP و دریافت توکن
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mobile, code]
+              properties:
+                mobile: { type: string, example: "09121234567" }
+                code: { type: string, example: "483920" }
+      responses:
+        "200":
+          description: Token pair
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokenPair" }
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /auth/login:
+    post:
+      security: []
+      summary: ورود با پسورد
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mobile, password]
+              properties:
+                mobile: { type: string }
+                password: { type: string, format: password }
+      responses:
+        "200":
+          description: Token pair
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokenPair" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+
+  /auth/refresh:
+    post:
+      security: []
+      summary: تمدید access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token: { type: string }
+      responses:
+        "200":
+          description: Token pair
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokenPair" }
+        "401": { $ref: "#/components/responses/Unauthenticated" }
+
+  /me:
+    get:
+      summary: پروفایل صاحب توکن
+      x-permission: users.view_own
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+
+  /users:
+    get:
+      summary: لیست کاربرها (صفحه‌بندی لاراول)
+      x-permission: users.view_any
+      parameters:
+        - { name: page, in: query, schema: { type: integer, minimum: 1 } }
+      responses:
+        "200": { description: Paginated users }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /users/{uuid}:
+    get:
+      summary: جزئیات یک کاربر
+      x-permission: users.view_any
+      parameters:
+        - { name: uuid, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+
+  responses:
+    ValidationError:
+      description: Laravel validation error
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Unauthenticated:
+      description: Missing/invalid credentials
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Forbidden:
+      description: Authenticated but lacks permission
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Error:
+      type: object
+      required: [message]
+      properties:
+        message: { type: string }
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+
+    TokenPair:
+      type: object
+      required: [access_token, refresh_token, expires_in]
+      properties:
+        access_token: { type: string, description: JWT RS256 }
+        refresh_token: { type: string }
+        expires_in: { type: integer, example: 900 }
+
+    User:
+      type: object
+      required: [uuid, mobile, role, status]
+      properties:
+        uuid: { type: string, example: "01J1FZK8Q0..." }
+        mobile: { type: string }
+        email: { type: string, nullable: true }
+        name: { type: string, nullable: true }
+        role:
+          type: string
+          enum: [super_admin, admin, user]
+        status:
+          type: string
+          enum: [active, suspended]
+        created_at: { type: string, format: date-time }

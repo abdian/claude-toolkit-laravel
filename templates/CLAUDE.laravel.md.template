@@ -1,0 +1,310 @@
+# CLAUDE.md
+
+<!--
+  LARAVEL EDITION of the CLAUDE.md template.
+
+  HOW TO USE
+  1. Copy to your project root. Commit it to git.
+  2. Fill the [BRACKETS]. Where options are listed with |, PICK ONE and
+     delete the rest. Delete every section that doesn't apply.
+  3. PRUNE RUTHLESSLY. Test for each line: "would removing this cause a
+     mistake?" If no -> delete it. A long file gets ignored.
+  4. Treat it like code: review it when things go wrong, prune it monthly.
+  5. Verify it loaded with /context
+
+  DEFAULT STACK (change freely — these are defaults, not law):
+    DB       : MariaDB   (alternatives: MySQL | PostgreSQL — pick per service)
+    Cache    : Redis
+    Queue    : Redis     (alternative: database driver for tiny services)
+    Session  : Redis     (API-only services: stateless, no session)
+    Testing  : Pest
+    Format   : Laravel Pint
+    Static   : Larastan (PHPStan)
+-->
+
+## Project
+
+[ONE SENTENCE: what this service/app is and who uses it]
+
+Stack: PHP [8.3], Laravel [11], [MariaDB | MySQL | PostgreSQL], Redis (cache + queue), [Blade + Livewire | Inertia + Vue | API-only]
+
+<!-- Microservice? Add one line: which other services this talks to, and how.
+     e.g. "Calls: identity (JWT verify), notification (async events). Called by: core." -->
+
+## Commands
+
+```bash
+[php artisan serve]                      # dev server — or Sail / Herd / docker compose up
+php artisan test --filter=[Name]         # ONE test — PREFER THIS
+php artisan test                         # full suite (Pest)
+vendor/bin/pint --dirty                  # format only changed files
+vendor/bin/phpstan analyse               # static analysis (Larastan)
+php artisan migrate:fresh --seed         # rebuild local DB from scratch
+[npm run dev]                            # assets via Vite — DELETE if API-only
+```
+
+Prefer running a single test over the whole suite. Run pint and phpstan after
+finishing a series of edits — not after every single file.
+
+## Scope discipline — IMPORTANT
+
+YOU MUST stay inside the scope of what was asked.
+
+- Change only the files the task requires. If you believe another file needs
+  changing, say so and ask first.
+- Do not "improve" adjacent code you happened to read. Mention it, move on.
+- Do not add features, options, config flags, or hooks that were not requested.
+- No `TODO`, no placeholder implementations, no stub functions, no dead code.
+  Either implement it or explicitly say it's out of scope.
+- If the requirements are ambiguous, ASK. Do not guess and build both branches.
+
+## The ladder — IMPORTANT
+
+Before writing any code, stop at the first rung that holds:
+
+1. **Does this need to exist at all?** Speculative need → skip it, say so in one
+   line. (YAGNI)
+2. **Already in this codebase?** A trait, scope, Action, Resource, rule, or
+   helper that already lives here → reuse it. Grep before you write.
+   Re-implementing what sits three files over is the most common waste.
+3. **Laravel or PHP already ships it?** `Str`, `Arr`, `Collection`, `Number`,
+   `Cache`, `Http`, `Storage`, `Bus`, `Pipeline`, `Validator` rules, PHP's own
+   `array_*` / `intdiv` / `DateTimeImmutable` — check before writing a helper.
+4. **A framework or platform feature covers it?** A DB constraint over an
+   app-level check, `casts` over an accessor+mutator pair, `Gate::before` over a
+   role check in ten places, an index over a cache layer, a `unique` rule +
+   unique index over a manual "does it exist" query.
+5. **An already-installed composer package solves it?** Read `composer.json`
+   first. Never add a package for what a few lines do.
+6. **One line?** One line.
+7. **Only then:** the minimum code that works.
+
+The ladder runs **after** you understand the problem, not instead of it. Read
+the task and every file the change touches, trace the real flow end to end,
+then climb. A small diff in the wrong place is not lazy — it's a second bug.
+
+Two rungs both work → take the higher one and move on. Two options the same
+size → take the one that's correct on edge cases. Lazy means writing less code,
+never picking the flimsier algorithm.
+
+**Bug fix = root cause, not symptom.** A report names a symptom. Before editing,
+grep every caller of the method you are about to touch. One guard in the shared
+method is a smaller diff than a guard in each caller — and patching only the
+path the ticket names leaves every sibling caller still broken.
+
+**Never lazy about:** understanding the problem, FormRequest validation at trust
+boundaries, Policy/Gate checks, error handling that prevents data loss,
+security, accessibility, money and date correctness, or anything I explicitly
+asked for. If I insist on the full version, build it — don't re-argue.
+
+## Simplicity level
+
+Level: **full**  <!-- lite | full | ultra | off — switch with /lazy -->
+
+| Level | Behaviour |
+|-------|-----------|
+| lite | Build what I asked for, then name the lazier alternative in one line. I pick. |
+| full | The ladder enforced. Framework and stdlib before custom code. Shortest working diff. Default. |
+| ultra | YAGNI extremist. Deletion before addition. Ship the one-liner and challenge the rest of the requirement in the same reply. |
+| off | Ladder suspended. Scope discipline, conventions, and correctness rules still apply. |
+
+## Simplicity rules — IMPORTANT
+
+Write the simplest thing that satisfies the stated requirement and nothing more.
+
+- **Eloquent IS the data layer.** No Repository pattern wrapped around it, no
+  generic BaseRepository, no interface with a single Eloquent implementation.
+- No Action/Service class for logic that fits in 5 lines of a controller or
+  model method. Extract when it's reused or genuinely long, not before.
+- No abstraction until there are 3 real call sites. Two is a coincidence.
+- No custom wrapper around framework features (mail, cache, queue, http
+  client). Use the facade/contract directly.
+- No defensive try/catch around code that cannot realistically fail. Let it
+  throw; Laravel's handler reports it, and the bug stays visible.
+- No premature optimization (caching, chunking, queues for fast work) without
+  a measured problem. Say "this could be slow if X" instead of pre-solving it.
+- Prefer boring, obvious code over clever code. Optimize for the next reader.
+
+If you find yourself writing "this makes it more flexible for the future" —
+stop. That's the signal you're over-engineering.
+
+## Deliberate shortcuts — the `lazy:` marker
+
+A simplification that cuts a **real corner with a known ceiling** gets a one-line
+marker where it lives:
+
+```php
+// lazy: in-memory counter, move to Redis when this runs on more than one node
+// lazy: O(n²) over the cart, fine under ~50 lines, index it if carts grow
+```
+
+Format: `lazy: <what was cut and its ceiling>, <the trigger to upgrade>`.
+
+- Only for a corner actually cut: a global lock, an O(n²) scan over a small set,
+  a naive heuristic, a missing index, a sync call that should eventually queue.
+  Not for ordinary small code — most code needs no marker at all.
+- **A `lazy:` marker is not a `TODO`.** It describes shipped, working code and
+  the point at which it stops being enough. The no-TODO rule above still stands.
+- Name the ceiling in units, not adjectives. "won't scale" is not a ceiling;
+  "fine under ~10k rows" is.
+- `/debt` harvests these into `DEBT.md` and checks which triggers have fired.
+  `/fix-one DEBT.md <n>` pays one off — and deletes the marker in the same commit.
+
+## Comment & output economy — IMPORTANT
+
+Comments and prose are re-read on every future pass over the file, by me and by
+you. Both stay minimal.
+
+In code:
+
+- Comment WHY, never WHAT. Delete any comment that restates the line under it.
+- No docblock on a method whose name and signature already say it. Write one
+  only when it carries what the types cannot: a unit (`minor units, not rials`),
+  an invariant, a caller contract, `@throws`, or the `@param array{...}` shape
+  phpstan actually needs.
+- No section banners (`// ===== Helpers =====`), no `// end foreach`, no
+  commented-out code — git remembers it.
+- Never narrate the diff in a comment (`// added validation here`,
+  `// changed per request`). The commit message is where that goes, if anywhere.
+- Budget: at most one comment per non-obvious block. A file needing a comment
+  every few lines needs better names instead.
+- Exceptions that always earn their place: a `lazy:` marker, a link to the issue
+  or RFC behind a non-obvious workaround, and a warning about a footgun that
+  bit someone before.
+
+In replies to me:
+
+- Code first. Then at most three short lines: what you skipped, when to add it.
+- No essays, no feature tours, no unrequested design notes, and no summary table
+  of the files you just changed — `git diff --stat` says it better.
+- If the explanation is longer than the code, delete the explanation. Every
+  paragraph defending a simplification is complexity smuggled back in as prose.
+- Explanation I explicitly asked for — a report, a walkthrough, per-phase notes,
+  a skill whose contract is a document — is not debt. Give that in full. This
+  rule is only against prose nobody asked for.
+
+## Laravel conventions
+
+- Validation lives in **FormRequest** classes. Never inline `$request->validate`
+  in controllers past the first prototype.
+- Authorization via **Policies** (and Gates for non-model checks). Check with
+  `can()` / `authorize()`. Never scatter role-string comparisons
+  (`$user->role === 'admin'`) through the codebase.
+- Controllers stay thin: FormRequest → call the work → return Resource/redirect.
+- All JSON output goes through **API Resources**. Never return a model or
+  `->toArray()` straight to a response — it leaks columns you add later.
+- Eager-load with `with()` / `load()`. Enable
+  `Model::preventLazyLoading(!app()->isProduction())` in AppServiceProvider
+  so N+1s explode in dev instead of prod.
+- Anything slow or external (mail, SMS, HTTP to another service, file
+  processing) runs as a **queued job** on Redis. Requests never wait on a
+  third party.
+- `env()` calls ONLY inside `config/*.php`. Everywhere else use `config()` —
+  `env()` returns null once config is cached.
+- **Money is integer minor units** ([rial | cent]). Never float, never decimal
+  strings in code. Format only at the display edge.
+- Dates: store UTC in DB, cast with `datetime`, convert to [Asia/Tehran] only
+  at the display edge. [Jalali conversion via one helper, one place.]
+- IDs: internal tables use bigint auto-increment; anything exposed in URLs or
+  referenced by another service also carries a **UUID/ULID** column. Internal
+  ints never leave this service.
+
+## Database & migrations
+
+- Default DB: [MariaDB | MySQL | PostgreSQL] — one choice per service, recorded
+  in the Stack line above. Redis for cache/queue[/session].
+- A migration that has been merged or deployed is **FROZEN**. Never edit it —
+  write a new migration. (Local-only, unmerged migrations may be squashed.)
+- `php artisan migrate:fresh --seed` must ALWAYS pass on a clean DB. If it
+  doesn't, that's a broken build, fix it first.
+- A schema change ships as a set: migration + model ($fillable/casts) +
+  factory + seeder (if the table is seeded) + affected Resources.
+- Foreign keys only INSIDE this service's own database. References to another
+  service's data are plain UUID columns — no cross-service FK, no cross-service
+  joins, no reading another service's DB. Ever.
+- Add the index in the same migration that introduces the query pattern
+  needing it.
+
+## Testing
+
+- Pest. **Feature tests over unit tests** for anything HTTP.
+- Every endpoint gets at least: happy path, one validation failure, one
+  authorization failure (wrong role / not owner).
+- Model data comes from **factories**, never hand-built arrays.
+- `RefreshDatabase` on feature tests. Tests never depend on each other or on
+  seed order.
+- External things are ALWAYS faked in tests: `Http::fake()`, `Queue::fake()`,
+  `Notification::fake()`, `Storage::fake()`, `Event::fake()` where asserting
+  dispatch. A test that hits a real gateway/SMS provider is a bug.
+
+## Correctness — do not fabricate
+
+- Never invent an API, artisan flag, config key, or package version. If you
+  are not certain it exists, read the source in vendor/, run
+  `php artisan list`, or say you need to check.
+- Before using an internal helper/scope/relation, grep for it and read its
+  actual signature.
+- Fix root causes, never suppress symptoms. No empty `catch {}`, no
+  `@phpstan-ignore` to silence a real error, no deleting an assert to make a
+  test pass.
+- If a test fails, fix the code — not the test — unless the test is provably
+  wrong, and then explain why.
+
+## Definition of done
+
+A task is not done until ALL of these hold. Report evidence, don't just assert.
+
+1. `vendor/bin/pint --dirty` applied (or `--test` passes)
+2. `vendor/bin/phpstan analyse` passes
+3. Relevant tests pass — paste the actual `php artisan test` output
+4. If schema changed: `php artisan migrate:fresh --seed` passes
+5. The change is scoped to the task (`git diff --stat` looks like it should)
+6. [for UI] a screenshot of the result exists and matches the intent
+
+## Architecture
+
+<!-- Non-obvious decisions only. Things that would take an hour to
+     reverse-engineer. Microservice examples: -->
+
+- [e.g. This service OWNS user/payment/media data. Others get it via the API
+  in ../specs/contracts/<name>.openapi.yaml or via events — never via DB.]
+- [e.g. Auth: stateless. Verifies RS256 JWT from the identity service using
+  its JWKS. No sessions here.]
+- [e.g. Outbound calls to other services live in app/Services/<Name>Client.php
+  — one thin class per remote service, nothing else calls Http directly.]
+- [e.g. Business logic lives in app/Actions, one verb per class.]
+
+## Gotchas
+
+<!-- Things that have bitten someone before. This section earns its keep. -->
+
+- [e.g. Requires DB_*, REDIS_*, JWT_PUBLIC_KEY in .env — see .env.example]
+- [e.g. Queue worker must be running or OTP/emails silently queue up:
+  php artisan queue:work]
+- [e.g. The database/migrations/legacy/ folder is frozen — never edit]
+
+## Git — commit policy
+
+<!-- Personal preference — delete if you want Claude to commit freely.
+     Pairs with templates/settings.json.template for hard enforcement. -->
+
+- NEVER run `git commit` on your own. A commit happens only when I explicitly
+  ask for one in this session ("commit", "کامیت بزن"). Finishing a task is NOT
+  permission. When you reach a good commit point, say so and stop.
+- Exception: skills whose contract includes a commit (`/fix-one`) — invoking
+  them is the permission. One commit per invocation, nothing more.
+- Never mention Claude, AI, or any assistant anywhere in a commit: no
+  "Generated with Claude Code" footer, no `Co-Authored-By:` trailer, nothing
+  in the message body or branch names. Write it as if I typed it myself.
+- Branch naming: [e.g. feat/short-description]
+- Commit messages: [e.g. Conventional Commits]
+- Never commit without running pint and phpstan first.
+- Never `git push --force` to a shared branch.
+
+## Compaction
+
+When compacting, always preserve: the full list of modified files, the task's
+original requirements, and any test commands that were established.
+
+<!-- Detailed / occasional knowledge goes in .claude/skills/ or referenced
+     docs, NOT here. Example: @docs/api-conventions.md -->

@@ -1,0 +1,232 @@
+# CLAUDE.md
+
+<!--
+  HOW TO USE THIS TEMPLATE
+  1. Copy to your project root. Commit it to git.
+  2. Fill the [BRACKETS]. Delete every section that doesn't apply to you.
+  3. PRUNE RUTHLESSLY. Test for each line: "would removing this cause a mistake?"
+     If no -> delete it. A long file gets ignored.
+  4. Treat it like code: review it when things go wrong, prune it monthly.
+  5. Verify it loaded with /context
+-->
+
+## Project
+
+[ONE SENTENCE: what this is and who uses it]
+
+Stack: [e.g. TypeScript, Next.js 15 App Router, Postgres via Drizzle, Tailwind]
+
+## Commands
+
+```bash
+[dev]        # e.g. pnpm dev
+[test-one]   # e.g. pnpm vitest run path/to/file.test.ts  <- PREFER THIS
+[test-all]   # e.g. pnpm test
+[typecheck]  # e.g. pnpm tsc --noEmit
+[lint]       # e.g. pnpm lint --fix
+[build]      # e.g. pnpm build
+```
+
+Prefer running a single test file over the whole suite. Run `[typecheck]` and
+`[lint]` after finishing a series of edits — not after every single file.
+
+## Scope discipline — IMPORTANT
+
+YOU MUST stay inside the scope of what was asked.
+
+- Change only the files the task requires. If you believe another file needs
+  changing, say so and ask first.
+- Do not "improve" adjacent code you happened to read. Mention it, move on.
+- Do not add features, options, config flags, or hooks that were not requested.
+- No `TODO`, no placeholder implementations, no stub functions, no dead code.
+  Either implement it or explicitly say it's out of scope.
+- If the requirements are ambiguous, ASK. Do not guess and build both branches.
+
+## The ladder — IMPORTANT
+
+Before writing any code, stop at the first rung that holds:
+
+1. **Does this need to exist at all?** Speculative need → skip it, say so in one
+   line. (YAGNI)
+2. **Already in this codebase?** A helper, util, type, hook, or pattern that
+   already lives here → reuse it. Grep before you write. Re-implementing what
+   sits three files over is the most common waste.
+3. **The standard library already does it?** Check before writing a helper.
+4. **A native platform feature covers it?** `<input type="date">` over a picker
+   library, CSS over JS, a DB constraint over an app-level check, an index over
+   a cache layer, the platform's own fetch/crypto/intl over a wrapper.
+5. **An already-installed dependency solves it?** Read the manifest first. Never
+   add a package for what a few lines do.
+6. **One line?** One line.
+7. **Only then:** the minimum code that works.
+
+The ladder runs **after** you understand the problem, not instead of it. Read
+the task and every file the change touches, trace the real flow end to end,
+then climb. A small diff in the wrong place is not lazy — it's a second bug.
+
+Two rungs both work → take the higher one and move on. Two options the same
+size → take the one that's correct on edge cases. Lazy means writing less code,
+never picking the flimsier algorithm.
+
+**Bug fix = root cause, not symptom.** A report names a symptom. Before editing,
+grep every caller of the method you are about to touch. One guard in the shared
+method is a smaller diff than a guard in each caller — and patching only the
+path the ticket names leaves every sibling caller still broken.
+
+**Never lazy about:** understanding the problem, input validation at trust
+boundaries, authorization checks, error handling that prevents data loss,
+security, accessibility, money and date correctness, or anything I explicitly
+asked for. If I insist on the full version, build it — don't re-argue.
+
+## Simplicity level
+
+Level: **full**  <!-- lite | full | ultra | off — switch with /lazy -->
+
+| Level | Behaviour |
+|-------|-----------|
+| lite | Build what I asked for, then name the lazier alternative in one line. I pick. |
+| full | The ladder enforced. Framework and stdlib before custom code. Shortest working diff. Default. |
+| ultra | YAGNI extremist. Deletion before addition. Ship the one-liner and challenge the rest of the requirement in the same reply. |
+| off | Ladder suspended. Scope discipline, conventions, and correctness rules still apply. |
+
+## Simplicity rules — IMPORTANT
+
+Write the simplest thing that satisfies the stated requirement and nothing more.
+
+- No abstraction until there are 3 real call sites. Two is a coincidence.
+- No interface / base class / factory / strategy pattern for a single
+  implementation.
+- No custom config system, plugin layer, or generic "engine" unless requested.
+- No defensive try/catch around code that cannot realistically fail. Let it
+  throw so the bug is visible.
+- No premature optimization (caching, memoization, workers) without a measured
+  problem. Say "this could be slow if X" instead of solving it preemptively.
+- Prefer boring, obvious code over clever code. Optimize for the next reader.
+
+If you find yourself writing "this makes it more flexible for the future" —
+stop. That's the signal you're over-engineering.
+
+## Deliberate shortcuts — the `lazy:` marker
+
+A simplification that cuts a **real corner with a known ceiling** gets a one-line
+marker where it lives:
+
+```ts
+// lazy: in-memory counter, move to Redis when this runs on more than one process
+// lazy: O(n²) over the cart, fine under ~50 lines, index it if carts grow
+```
+
+Format: `lazy: <what was cut and its ceiling>, <the trigger to upgrade>`.
+
+- Only for a corner actually cut: a global lock, an O(n²) scan over a small set,
+  a naive heuristic, a missing index, a sync call that should eventually queue.
+  Not for ordinary small code — most code needs no marker at all.
+- **A `lazy:` marker is not a `TODO`.** It describes shipped, working code and
+  the point at which it stops being enough. The no-TODO rule above still stands.
+- Name the ceiling in units, not adjectives. "won't scale" is not a ceiling;
+  "fine under ~10k rows" is.
+- `/debt` harvests these into `DEBT.md` and checks which triggers have fired.
+  `/fix-one DEBT.md <n>` pays one off — and deletes the marker in the same commit.
+
+## Comment & output economy — IMPORTANT
+
+Comments and prose are re-read on every future pass over the file, by me and by
+you. Both stay minimal.
+
+In code:
+
+- Comment WHY, never WHAT. Delete any comment that restates the line under it.
+- No doc comment on a function whose name and signature already say it. Write
+  one only when it carries what the types cannot: a unit (`minor units, not
+  dollars`), an invariant, a caller contract, or what it throws.
+- No section banners (`// ===== Helpers =====`), no `// end if`, no
+  commented-out code — git remembers it.
+- Never narrate the diff in a comment (`// added validation here`,
+  `// changed per request`). The commit message is where that goes, if anywhere.
+- Budget: at most one comment per non-obvious block. A file needing a comment
+  every few lines needs better names instead.
+- Exceptions that always earn their place: a `lazy:` marker, a link to the issue
+  or RFC behind a non-obvious workaround, and a warning about a footgun that
+  bit someone before.
+
+In replies to me:
+
+- Code first. Then at most three short lines: what you skipped, when to add it.
+- No essays, no feature tours, no unrequested design notes, and no summary table
+  of the files you just changed — `git diff --stat` says it better.
+- If the explanation is longer than the code, delete the explanation. Every
+  paragraph defending a simplification is complexity smuggled back in as prose.
+- Explanation I explicitly asked for — a report, a walkthrough, per-phase notes,
+  a skill whose contract is a document — is not debt. Give that in full. This
+  rule is only against prose nobody asked for.
+
+## Correctness — do not fabricate
+
+- Never invent an API, function, flag, or library version. If you are not
+  certain it exists, read the source in the repo or say you need to check.
+- Before using an internal helper, grep for it and read its actual signature.
+- Fix root causes, never suppress symptoms. No `// @ts-ignore`, no `any`,
+  no `catch {}` to make an error go away, no skipping a failing test.
+- If a test fails, fix the code — not the test — unless the test is provably
+  wrong, and then explain why.
+
+## Definition of done
+
+A task is not done until ALL of these hold. Report evidence, don't just assert.
+
+1. `[typecheck]` passes
+2. `[lint]` passes
+3. Relevant tests pass — paste the actual output
+4. The change is scoped to the task (`git diff --stat` looks like it should)
+5. [for UI] a screenshot of the result exists and matches the intent
+
+## Code style
+
+<!-- ONLY list rules that differ from the ecosystem default. Delete the rest. -->
+
+- [e.g. ES modules only, never CommonJS require]
+- [e.g. named exports only, no default exports]
+- [e.g. no barrel/index.ts re-export files]
+- Names: full words, no abbreviations. `userRepository` not `usrRepo`.
+
+## Architecture
+
+<!-- Non-obvious decisions only. Things that would take an hour to reverse-engineer. -->
+
+- [e.g. All DB access goes through src/db/queries/. Components never import drizzle.]
+- [e.g. Server Components by default; "use client" only for interactivity.]
+- [e.g. Errors bubble to route-level error boundaries. No per-component try/catch.]
+
+## Gotchas
+
+<!-- Things that have bitten someone before. This section earns its keep over time. -->
+
+- [e.g. Requires DATABASE_URL and AUTH_SECRET in .env.local]
+- [e.g. The legacy/ directory is frozen — never edit it]
+- [e.g. Migrations must be generated, never hand-written]
+
+## Git — commit policy
+
+<!-- Personal preference — delete if you want Claude to commit freely.
+     Pairs with templates/settings.json.template for hard enforcement. -->
+
+- NEVER run `git commit` on your own. A commit happens only when I explicitly
+  ask for one in this session ("commit", "کامیت بزن"). Finishing a task is NOT
+  permission. When you reach a good commit point, say so and stop.
+- Exception: skills whose contract includes a commit (`/fix-one`) — invoking
+  them is the permission. One commit per invocation, nothing more.
+- Never mention Claude, AI, or any assistant anywhere in a commit: no
+  "Generated with Claude Code" footer, no `Co-Authored-By:` trailer, nothing
+  in the message body or branch names. Write it as if I typed it myself.
+- Branch naming: [e.g. feat/short-description]
+- Commit messages: [e.g. Conventional Commits]
+- Never commit without running `[typecheck]` and `[lint]` first.
+- Never `git push --force` to a shared branch.
+
+## Compaction
+
+When compacting, always preserve: the full list of modified files, the task's
+original requirements, and any test commands that were established.
+
+<!-- Detailed / occasional knowledge goes in .claude/skills/ or referenced docs,
+     NOT here. Example: @docs/api-conventions.md -->

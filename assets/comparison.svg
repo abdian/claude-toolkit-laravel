@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="620" viewBox="0 0 1280 620">
+  <defs>
+    <radialGradient id="g6" cx="22%" cy="12%" r="98%"><stop offset="0" stop-color="#241E18"/><stop offset="1" stop-color="#110E0B"/></radialGradient>
+    <filter id="n6"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" result="n"/><feColorMatrix in="n" type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.04"/></feComponentTransfer></filter>
+  </defs>
+
+  <rect width="1280" height="620" fill="url(#g6)"/>
+  <rect width="1280" height="620" filter="url(#n6)" opacity="0.6"/>
+
+  <text x="72" y="72" font-family="Georgia,serif" font-size="36" font-weight="bold" fill="#F1EADD">Where each tool actually helps</text>
+  <text x="72" y="104" font-family="Consolas,monospace" font-size="15" fill="#8C8071">Coverage across the life of a feature. Not a ranking — they compose.</text>
+
+  <!-- phase column headers -->
+  <g font-family="Georgia,serif" font-size="14.5" font-style="italic" fill="#8C8071" text-anchor="middle">
+    <text x="396" y="160">Idea</text>
+    <text x="520" y="160">Specs</text>
+    <text x="644" y="160">Brief</text>
+    <text x="768" y="160">Plan</text>
+    <text x="892" y="160">Code</text>
+    <text x="1016" y="160">Audit</text>
+    <text x="1140" y="160">Fix</text>
+  </g>
+  <path d="M334 174 H1202" stroke="#3A322A" stroke-width="1"/>
+  <g stroke="#241E18" stroke-width="1">
+    <line x1="458" y1="174" x2="458" y2="516"/>
+    <line x1="582" y1="174" x2="582" y2="516"/>
+    <line x1="706" y1="174" x2="706" y2="516"/>
+    <line x1="830" y1="174" x2="830" y2="516"/>
+    <line x1="954" y1="174" x2="954" y2="516"/>
+    <line x1="1078" y1="174" x2="1078" y2="516"/>
+  </g>
+
+  <!-- row 1 — this toolkit -->
+  <text x="72" y="212" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#F1EADD">claude-toolkit-laravel</text>
+  <text x="72" y="232" font-family="Consolas,monospace" font-size="12" fill="#6A6153">17 skills · this repo</text>
+  <rect x="340" y="192" width="856" height="44" rx="4" fill="#211710" stroke="#E24E3A" stroke-width="2"/>
+  <text x="768" y="219" font-family="Consolas,monospace" font-size="13" fill="#C6BCAB" text-anchor="middle">/spec-import · /brief · /edges · /plan-check · /audit-codebase · /fix-one</text>
+
+  <!-- row 2 — ponytail -->
+  <text x="72" y="288" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#F1EADD">ponytail</text>
+  <text x="72" y="308" font-family="Consolas,monospace" font-size="12" fill="#6A6153">code minimization</text>
+  <rect x="836" y="268" width="236" height="44" rx="4" fill="#1B1611" stroke="#5E554A" stroke-width="1.4"/>
+  <text x="954" y="295" font-family="Consolas,monospace" font-size="13" fill="#C6BCAB" text-anchor="middle">the ladder, via hook</text>
+
+  <!-- row 3 — boost -->
+  <text x="72" y="364" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#F1EADD">Laravel Boost</text>
+  <text x="72" y="384" font-family="Consolas,monospace" font-size="12" fill="#6A6153">framework correctness</text>
+  <rect x="836" y="344" width="112" height="44" rx="4" fill="#1B1611" stroke="#5E554A" stroke-width="1.4"/>
+  <text x="892" y="371" font-family="Consolas,monospace" font-size="13" fill="#C6BCAB" text-anchor="middle">idioms + docs</text>
+
+  <!-- row 4 — openspec -->
+  <text x="72" y="440" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#F1EADD">OpenSpec</text>
+  <text x="72" y="460" font-family="Consolas,monospace" font-size="12" fill="#6A6153">change workflow</text>
+  <rect x="588" y="420" width="360" height="44" rx="4" fill="#1B1611" stroke="#5E554A" stroke-width="1.4"/>
+  <text x="768" y="447" font-family="Consolas,monospace" font-size="13" fill="#C6BCAB" text-anchor="middle">propose → tasks → apply → archive</text>
+
+  <!-- row 5 — baseline -->
+  <text x="72" y="516" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#6A6153">CLAUDE.md alone</text>
+  <text x="72" y="536" font-family="Consolas,monospace" font-size="12" fill="#5E554A">the usual setup</text>
+  <rect x="836" y="496" width="112" height="44" rx="4" fill="none" stroke="#3A322A" stroke-dasharray="4 4"/>
+  <text x="892" y="523" font-family="Consolas,monospace" font-size="12.5" fill="#6A6153" text-anchor="middle">unverified</text>
+
+  <!-- footnote -->
+  <path d="M72 570 H1208" stroke="#3A322A" stroke-width="1"/>
+  <text x="72" y="600" font-family="Georgia,serif" font-size="16" font-style="italic" fill="#C6BCAB">Only the ladder overlaps. Let one tool own it, or the two mode settings will quietly disagree.</text>
+</svg>

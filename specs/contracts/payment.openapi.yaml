@@ -1,0 +1,158 @@
+openapi: 3.0.3
+info:
+  title: payment service
+  version: 0.1.0
+  description: >
+    پرداخت با الگوی driver درگاه. مبلغ همیشه عدد صحیح [ریال]. payment
+    نمی‌داند «بابت چی» — فقط reference_uuid سرویس درخواست‌دهنده را نگه
+    می‌دارد. webhookها idempotent اند.
+
+servers:
+  - url: http://payment.localhost/api
+
+security:
+  - bearerAuth: []
+
+paths:
+  /health:
+    get:
+      security: []
+      summary: Liveness check
+      responses:
+        "200": { description: OK }
+
+  /payments:
+    post:
+      summary: ساخت پرداخت و گرفتن آدرس درگاه
+      x-permission: payments.create_own
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, reference_uuid, callback_url]
+              properties:
+                amount:
+                  type: integer
+                  minimum: 1000
+                  description: ریال
+                  example: 2500000
+                reference_uuid:
+                  type: string
+                  description: شناسه سفارش/فاکتور در سرویس درخواست‌دهنده
+                gateway:
+                  type: string
+                  nullable: true
+                  description: خالی = درگاه پیش‌فرض
+                  example: "zarinpal"
+                callback_url:
+                  type: string
+                  format: uri
+      responses:
+        "201":
+          description: Created — کاربر را به redirect_url بفرست
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [uuid, status, redirect_url]
+                properties:
+                  uuid: { type: string }
+                  status: { type: string, enum: [pending] }
+                  redirect_url: { type: string, format: uri }
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /payments/{uuid}:
+    get:
+      summary: وضعیت/جزئیات پرداخت
+      description: صاحبش با payments.view_own؛ ادمین‌ها با payments.view_any.
+      x-permission: payments.view_own
+      parameters:
+        - { name: uuid, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Payment
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Payment" }
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /payments/{uuid}/refund:
+    post:
+      summary: استرداد (کامل یا جزئی)
+      x-permission: payments.refund
+      parameters:
+        - { name: uuid, in: path, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  nullable: true
+                  description: خالی = استرداد کامل
+      responses:
+        "202": { description: Refund accepted }
+        "409":
+          description: وضعیت پرداخت اجازه استرداد نمی‌دهد
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /webhooks/{gateway}:
+    post:
+      security: []
+      summary: callback درگاه — احراز با امضای خود درگاه، نه JWT
+      description: >
+        idempotent — دریافت تکراری همان تراکنش، event تکراری تولید نمی‌کند.
+        نتیجه از طریق event های payment.* منتشر می‌شود (EVENTS.md).
+      parameters:
+        - { name: gateway, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Acknowledged }
+
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+
+  schemas:
+    Error:
+      type: object
+      required: [message]
+      properties:
+        message: { type: string }
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items: { type: string }
+
+    Payment:
+      type: object
+      required: [uuid, amount, status, reference_uuid, gateway]
+      properties:
+        uuid: { type: string }
+        user_uuid: { type: string }
+        reference_uuid: { type: string }
+        amount: { type: integer, description: ریال }
+        gateway: { type: string, example: "zarinpal" }
+        status:
+          type: string
+          enum: [pending, succeeded, failed, refunded]
+        gateway_ref:
+          type: string
+          nullable: true
+          description: شماره پیگیری درگاه
+        paid_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }

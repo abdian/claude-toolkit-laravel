@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="t d">
+  <title id="t">claude-toolkit-laravel — plans get a verdict before they get a commit</title>
+  <desc id="d">A proposed plan of three invented service classes, struck out by a handwritten editor's mark reading "trim.", with the approved scope beneath it: one migration, one validation rule.</desc>
+
+  <defs>
+    <radialGradient id="ground" cx="22%" cy="14%" r="98%">
+      <stop offset="0" stop-color="#241E18"/>
+      <stop offset="1" stop-color="#110E0B"/>
+    </radialGradient>
+    <filter id="tooth">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.042"/></feComponentTransfer>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#ground)"/>
+  <rect width="1280" height="640" filter="url(#tooth)" opacity="0.6"/>
+
+  <!-- ── masthead ── -->
+  <text x="64" y="66" font-family="Consolas,monospace" font-size="13" fill="#8C7B6A" letter-spacing="3.6">LESS ARCHITECTURE. MORE INTENT.</text>
+  <text x="1216" y="66" font-family="Consolas,monospace" font-size="13" fill="#6F6152" letter-spacing="3.6" text-anchor="end">LARAVEL · CLAUDE CODE</text>
+
+  <text x="60" y="176" font-family="Georgia,serif" font-size="92" font-weight="bold"
+        fill="#F4EAD8" letter-spacing="-2.4">claude-toolkit-laravel</text>
+  <path d="M64 212H1216" stroke="#4A3C32" stroke-width="1"/>
+
+  <!-- ── left: the claim ── -->
+  <text x="64" y="264" font-family="Consolas,monospace" font-size="17" fill="#C69A6E">/plan-check</text>
+  <text x="62" y="330" font-family="Georgia,serif" font-size="44" fill="#F4EAD8">Plans get a verdict</text>
+  <text x="62" y="386" font-family="Georgia,serif" font-size="44" fill="#F4EAD8">before they get</text>
+  <text x="62" y="442" font-family="Georgia,serif" font-size="44" font-style="italic" fill="#C6A98C">a commit.</text>
+
+  <line x1="616" y1="240" x2="616" y2="556" stroke="#33291F" stroke-width="1"/>
+
+  <!-- ── right: the markup ── -->
+  <text x="664" y="266" font-family="Consolas,monospace" font-size="12" fill="#8C7B6A" letter-spacing="2.4">PROPOSED PLAN</text>
+
+  <g font-family="Consolas,monospace" font-size="23" fill="#7A6757">
+    <text x="664" y="318">DiscountServiceInterface</text>
+    <text x="664" y="362">DiscountServiceFactory</text>
+    <text x="664" y="406">DiscountService</text>
+  </g>
+
+  <!-- THE SIGNATURE: an editor's hand, looping back on itself -->
+  <path d="M654 418
+           C744 392 856 350 992 306
+           C1099 272 1177 250 1180 290
+           C1184 327 1138 367 1104 356
+           C1067 344 1086 300 1130 292
+           C1166 285 1189 314 1181 349
+           C1168 408 1042 448 894 444"
+        fill="none" stroke="#E8563B" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="700" y="476" transform="rotate(-9 700 476)" font-family="Georgia,serif" font-style="italic"
+        font-size="62" font-weight="bold" fill="#E8563B" letter-spacing="-1.5">trim.</text>
+
+  <text x="1216" y="472" font-family="Consolas,monospace" font-size="14" fill="#8C7B6A" text-anchor="end">two layers nobody asked for</text>
+
+  <path d="M664 508H1216" stroke="#4A3C32" stroke-width="1"/>
+  <text x="664" y="536" font-family="Consolas,monospace" font-size="11.5" fill="#7FA57F" letter-spacing="1.8">APPROVED SCOPE</text>
+  <text x="664" y="568" font-family="Georgia,serif" font-size="27" fill="#F4EAD8">1 migration. 1 validation rule.</text>
+
+  <!-- ── footer ── -->
+  <path d="M64 596H616" stroke="#33291F" stroke-width="1"/>
+  <text x="64" y="624" font-family="Consolas,monospace" font-size="14.5" fill="#8C7B6A">17 slash commands · specs · audit · one-fix loop</text>
+</svg>

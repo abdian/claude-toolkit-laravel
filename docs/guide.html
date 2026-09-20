@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>راهنمای جعبه‌ابزار Claude Code</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#0A0F1A; --panel:#101827; --panel-2:#141E31; --rule:#1E2B44;
+  --text:#DCE5F2; --dim:#7E90AC; --dimmer:#54637E;
+  --cmd:#6FD3F7;
+  --t1:#56D98B; --t2:#F2B544; --t3:#F0736B;
+  --fa:'Vazirmatn',system-ui,'Segoe UI',Tahoma,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{
+  margin:0;background:var(--paper);color:var(--text);font-family:var(--fa);
+  font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased;
+  background-image:
+    linear-gradient(var(--rule) 1px,transparent 1px),
+    linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+  background-size:56px 56px;
+  background-position:-1px -1px;
+}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,transparent,var(--paper) 78%);pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+code,kbd,.mono{font-family:var(--mono);direction:ltr;unicode-bidi:isolate;font-size:.88em}
+a{color:var(--cmd);text-decoration:none;border-bottom:1px solid transparent}
+a:hover{border-bottom-color:var(--cmd)}
+:focus-visible{outline:2px solid var(--cmd);outline-offset:3px;border-radius:4px}
+
+/* ---------- header ---------- */
+header{padding:72px 0 30px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--dimmer);text-transform:uppercase;direction:ltr;text-align:right}
+h1{font-size:clamp(30px,5.4vw,52px);line-height:1.25;margin:14px 0 10px;font-weight:800;letter-spacing:-.01em}
+h1 .accent{color:var(--cmd)}
+.lede{color:var(--dim);max-width:56ch;font-size:17px;margin:0}
+
+/* ---------- tier picker (signature) ---------- */
+.picker{position:sticky;top:0;z-index:20;background:rgba(10,15,26,.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--rule)}
+.picker-in{max-width:var(--maxw);margin:0 auto;padding:14px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.picker-label{font-size:13px;color:var(--dim);white-space:nowrap}
+.tiers{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.tier{
+  appearance:none;cursor:pointer;font-family:var(--fa);font-size:14px;font-weight:600;
+  background:var(--panel);color:var(--dim);border:1px solid var(--rule);
+  padding:9px 15px;border-radius:9px;transition:.18s;display:flex;align-items:center;gap:8px;line-height:1
+}
+.tier:hover{border-color:var(--dimmer);color:var(--text)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.tier[data-t="1"] .dot{background:var(--t1)} .tier[data-t="2"] .dot{background:var(--t2)}
+.tier[data-t="3"] .dot{background:var(--t3)} .tier[data-t="all"] .dot{background:var(--dimmer)}
+.tier.on{color:var(--paper);background:var(--text);border-color:var(--text)}
+.tier[data-t="1"].on{background:var(--t1);border-color:var(--t1)}
+.tier[data-t="2"].on{background:var(--t2);border-color:var(--t2)}
+.tier[data-t="3"].on{background:var(--t3);border-color:var(--t3)}
+.tier.on .dot{background:var(--paper)}
+.count{font-family:var(--mono);font-size:12px;color:var(--dim);white-space:nowrap;direction:ltr}
+.count b{color:var(--cmd);font-size:15px}
+
+/* ---------- layout ---------- */
+.cols{display:grid;grid-template-columns:190px 1fr;gap:44px;padding:44px 0 100px;align-items:start}
+nav{position:sticky;top:76px}
+nav ol{list-style:none;margin:0;padding:0;border-right:1px solid var(--rule)}
+nav a{display:block;padding:7px 14px 7px 0;font-size:14px;color:var(--dim);border-right:2px solid transparent;margin-right:-1px;border-bottom:0}
+nav a:hover{color:var(--text)}
+nav a.on{color:var(--cmd);border-right-color:var(--cmd)}
+nav .num{font-family:var(--mono);font-size:11px;color:var(--dimmer);margin-left:8px}
+
+section{margin-bottom:76px;scroll-margin-top:96px}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;border-bottom:1px solid var(--rule);padding-bottom:12px}
+.snum{font-family:var(--mono);font-size:13px;color:var(--cmd);font-weight:600}
+h2{font-size:27px;margin:0;font-weight:800;letter-spacing:-.01em}
+.sdesc{color:var(--dim);margin:0 0 26px;font-size:15px}
+h3{font-size:18px;margin:34px 0 12px;font-weight:700}
+p{margin:0 0 14px}
+.dim{color:var(--dim)}
+
+/* ---------- code ---------- */
+.code{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:11px;margin:14px 0;overflow:hidden}
+.code pre{margin:0;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.75;direction:ltr;text-align:left;color:#B9CADF}
+.code .c{color:var(--dimmer)} .code .k{color:var(--cmd);font-weight:600} .code .s{color:var(--t1)} .code .p{color:var(--t2)}
+.cp{position:absolute;top:8px;left:8px;background:var(--panel-2);color:var(--dim);border:1px solid var(--rule);
+  border-radius:7px;padding:4px 9px;font-family:var(--mono);font-size:11px;cursor:pointer;opacity:0;transition:.15s}
+.code:hover .cp,.cp:focus{opacity:1}
+.cp.done{color:var(--t1);border-color:var(--t1)}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--rule);border-radius:11px}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:460px}
+th{background:var(--panel);text-align:right;padding:11px 14px;font-weight:700;font-size:13px;color:var(--dim);border-bottom:1px solid var(--rule);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--panel-2)}
+
+/* ---------- tool cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px;margin:18px 0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:13px;padding:17px 18px;transition:.2s}
+.card:hover{border-color:var(--dimmer)}
+.card.off{display:none}
+.ctop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:9px}
+.cname{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--cmd);direction:ltr}
+.pills{display:flex;gap:4px}
+.pill{width:19px;height:19px;border-radius:5px;font-family:var(--mono);font-size:10px;font-weight:600;
+  display:grid;place-items:center;color:var(--paper)}
+.pill.p1{background:var(--t1)} .pill.p2{background:var(--t2)} .pill.p3{background:var(--t3)}
+.pill.no{background:transparent;border:1px dashed var(--rule);color:var(--dimmer)}
+.card p{font-size:14px;color:var(--dim);margin:0 0 10px;line-height:1.7}
+.cwhen{font-size:12.5px;color:var(--dimmer);border-top:1px solid var(--rule);padding-top:9px;margin:0}
+.cwhen b{color:var(--text);font-weight:600}
+
+/* ---------- callouts ---------- */
+.note{border-right:3px solid var(--cmd);background:var(--panel);padding:14px 17px;border-radius:0 11px 11px 0;margin:18px 0;font-size:14.5px}
+.note.warn{border-right-color:var(--t2)}
+.note.stop{border-right-color:var(--t3)}
+.note b{color:var(--text)}
+.note p:last-child{margin-bottom:0}
+
+/* ---------- tree ---------- */
+.tree{background:var(--panel);border:1px solid var(--rule);border-radius:11px;padding:17px 18px;margin:14px 0;
+  font-family:var(--mono);font-size:13px;line-height:1.9;direction:ltr;text-align:left;overflow-x:auto;color:#B9CADF}
+.tree .d{color:var(--cmd)} .tree .n{color:var(--dimmer)} .tree .st{color:var(--t1)}
+
+/* ---------- flow ---------- */
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0}
+.step{background:var(--panel);border:1px solid var(--rule);border-radius:9px;padding:8px 13px;font-family:var(--mono);font-size:13px;color:var(--cmd);direction:ltr}
+.step.plain{color:var(--dim)}
+.arrow{color:var(--dimmer);font-family:var(--mono)}
+
+/* ---------- priority ladder ---------- */
+.ladder{margin:16px 0}
+.rung{display:flex;gap:14px;align-items:flex-start;padding:13px 16px;border:1px solid var(--rule);border-radius:11px;margin-bottom:7px;background:var(--panel)}
+.rung .lv{font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 9px;border-radius:6px;color:var(--paper);white-space:nowrap;flex:none;margin-top:3px}
+.r1 .lv{background:var(--t3)} .r2 .lv{background:#E8925C} .r3 .lv{background:var(--t2)} .r4 .lv{background:var(--dimmer)}
+.rung div strong{display:block;margin-bottom:2px}
+.rung div span{font-size:13.5px;color:var(--dim)}
+
+footer{border-top:1px solid var(--rule);padding:30px 0 60px;color:var(--dimmer);font-size:13.5px}
+
+@media(max-width:860px){
+  .cols{grid-template-columns:1fr;gap:0;padding-top:28px}
+  nav{position:static;margin-bottom:34px}
+  nav ol{border-right:0;border-top:1px solid var(--rule);padding-top:12px;display:flex;flex-wrap:wrap;gap:2px}
+  nav a{border-right:0;border-bottom:2px solid transparent;padding:5px 10px}
+  nav a.on{border-right:0;border-bottom-color:var(--cmd)}
+  header{padding:44px 0 22px}
+  .picker-in{gap:9px}
+  .count{width:100%}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">claude code · toolkit v1.4</div>
+    <h1>راهنمای جعبه‌ابزار <span class="accent">Claude Code</span></h1>
+    <p class="lede">هفده دستور برای اینکه کد درست، خوانا و قابل‌توسعه در بیاد — بدون کد الکی و بدون پیچیدگی اضافه. اول بگو چی می‌سازی تا فقط چیزی که لازم داری نشونت بدم.</p>
+    <p class="lede">🎓 <b>اولین باره؟</b> این صفحه مرجعه — آموزش قدم‌به‌قدم با دیالوگ واقعی و مثال کامل رو از <a href="tutorial.html"><b>tutorial.html</b></a> شروع کن (نسخه متنی: <code>TUTORIAL.md</code>).</p>
+  </div>
+</header>
+
+<div class="picker">
+  <div class="picker-in">
+    <span class="picker-label">چی می‌سازی؟</span>
+    <div class="tiers" role="group" aria-label="انتخاب اندازه پروژه">
+      <button class="tier on" data-t="all"><span class="dot"></span>همه</button>
+      <button class="tier" data-t="1"><span class="dot"></span>اسکریپت یه‌بارمصرف</button>
+      <button class="tier" data-t="2"><span class="dot"></span>افزونه یا سرویس کوچیک</button>
+      <button class="tier" data-t="3"><span class="dot"></span>اپلیکیشن بلندمدت</button>
+    </div>
+    <span class="count" id="count"><b>17</b> / 17 tools</span>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="cols">
+
+<nav aria-label="فهرست">
+  <ol>
+    <li><a href="#install" class="on"><span class="num">01</span>نصب</a></li>
+    <li><a href="#map"><span class="num">02</span>نقشه فایل‌ها</a></li>
+    <li><a href="#tools"><span class="num">03</span>ابزارها</a></li>
+    <li><a href="#cycle"><span class="num">04</span>نقشه راه</a></li>
+    <li><a href="#reports"><span class="num">05</span>گزارش‌ها</a></li>
+    <li><a href="#update"><span class="num">06</span>آپدیت</a></li>
+    <li><a href="#trouble"><span class="num">07</span>عیب‌یابی</a></li>
+    <li><a href="#rules"><span class="num">08</span>قوانین طلایی</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- 01 -->
+<section id="install">
+  <div class="shead"><span class="snum">01</span><h2>نصب</h2></div>
+  <p class="sdesc">جعبه‌ابزار رو می‌ذاری داخل پروژه و از داخلش نصب می‌کنی.</p>
+
+  <h3>روش سریع</h3>
+  <div class="code"><button class="cp">copy</button><pre><span class="k">cd</span> _toolkit
+<span class="k">bash</span> install.sh</pre></div>
+  <p>این <b>شش ابزار پایه</b> رو نصب می‌کنه: <code>start</code>، <code>next</code>، <code>brief</code>، <code>plan-check</code>، <code>fix-one</code>، <code>lazy</code>. با همین شروع کن.</p>
+
+  <h3>گزینه‌های دیگه</h3>
+  <div class="code"><button class="cp">copy</button><pre><span class="k">bash</span> install.sh --all              <span class="c"># هر هفده تا</span>
+<span class="k">bash</span> install.sh --all --global     <span class="c"># تو ~/.claude/skills به‌جای پروژه</span>
+<span class="k">bash</span> install.sh --all --force      <span class="c"># چیزی که هست رو بازنویسی کن</span></pre></div>
+  <p>پیش‌فرض <b>پروژه‌ای</b> و <b>symlink</b>ـه: ابزارها می‌رن تو <code>.claude/skills/</code> همون پروژه و ویرایش <code>skills/</code> فوراً اعمال می‌شه. جایی که symlink واقعی ممکن نباشه (ویندوز بدون Developer Mode) اسکریپت کپی نصب می‌کنه و خودش بهت می‌گه — اون‌وقت بعد از هر ویرایش <code>--force</code> لازمه.</p>
+
+  <h3>بررسی نصب</h3>
+  <p>داخل Claude Code بزن:</p>
+  <div class="code"><button class="cp">copy</button><pre><span class="k">/skills</span>   <span class="c"># لیست ابزارها</span>
+<span class="k">/doctor</span>   <span class="c"># اگه چیزی پیدا نشد، دلیلش رو می‌گه</span></pre></div>
+
+  <div class="note warn"><p><b>یک skill شخصی، skill پروژه‌ای هم‌نام رو کنار می‌زنه.</b> اگه قبلاً سراسری نصب کرده بودی، نصب پروژه‌ای هیچ اثری نداره و هنوز نسخه‌ی قدیمی اجرا می‌شه — یا <code>~/.claude/skills/</code> رو پاک کن، یا با <code>--global</code> همون رو به‌روز کن.</p></div>
+
+  <div class="note"><p><b>اگه دستورها نیومدن:</b> skill پروژه‌ای از پوشه‌ای لود می‌شه که <code>claude</code> رو از داخلش اجرا کردی، نه از پوشه‌های بالاتر — اول چک کن از ریشه پروژه اجراش کرده باشی. برای نصب سراسری، اگه <code>~/.claude/skills</code> تازه ساخته شده یک بار ری‌استارت لازمه.</p></div>
+
+  <div class="note warn"><p><b>ویندوز:</b> <code>install.sh</code> رو از Git Bash یا WSL اجرا کن، نه cmd/PowerShell.</p></div>
+
+  <h3>قانون کامیت — اختیاری، پیشنهادی</h3>
+  <p>دو لایه: <b>قانون</b> (تمپلیت <code>CLAUDE.md.template</code> حالا بخش <code>Git — commit policy</code> داره: کامیت فقط با دستور صریح تو، هیچ اسمی از Claude هیچ‌جای کامیت) + <b>اجرای قطعی</b> — محتوای <code>templates/settings.json.template</code> رو کپی کن تو <code>~/.claude/settings.json</code>:</p>
+  <div class="code"><button class="cp">copy</button><pre>{
+  <span class="s">"attribution"</span>: { <span class="s">"commit"</span>: <span class="s">""</span>, <span class="s">"pr"</span>: <span class="s">""</span> },
+  <span class="s">"permissions"</span>: { <span class="s">"ask"</span>: [<span class="s">"Bash(git commit:*)"</span>] }
+}</pre></div>
+  <p class="dim"><code>attribution</code> خالی → حذف قطعی <code>Co-Authored-By</code> و footer. <code>ask</code> → هر کامیت قبل از اجرا ازت تأیید می‌گیره. <code>includeCoAuthoredBy</code> منسوخه — همزمان با <code>attribution</code> استفاده‌ش نکن.</p>
+</section>
+
+<!-- 02 -->
+<section id="map">
+  <div class="shead"><span class="snum">02</span><h2>نقشه فایل‌ها</h2></div>
+  <p class="sdesc">دو جای مختلف. ابزارها یک‌جا، خروجی‌ها جای دیگه.</p>
+
+  <h3>ابزارها — سراسری</h3>
+  <p>پیش‌فرض داخل خود پروژه نصب می‌شن، پس قابل کامیت‌ان و هر پروژه می‌تونه نسخه‌ی خودش رو داشته باشه. با <code>--global</code> به‌جاش تو <code>~/.claude/skills/</code> می‌شینن (<code>~</code> یعنی پوشه خونه‌ات).</p>
+  <div class="tree">my-project/
+├── <span class="d">_toolkit</span>/                      <span class="n">← خود جعبه‌ابزار، تو گیت</span>
+│   ├── install.sh
+│   ├── docx2md.py                 <span class="n">← مبدل docx برای /spec-import</span>
+│   ├── skills/                    <span class="n">← منبع اصلی، اینجا ویرایشش می‌کنی</span>
+│   └── templates/
+└── <span class="d">.claude/skills</span>/                <span class="n">← install.sh اینجا لینک می‌کنه</span>
+    ├── <span class="d">start</span>/SKILL.md                 <span class="n">← در ورودی</span>
+    ├── <span class="d">next</span>/SKILL.md                  <span class="n">← راننده روزمره</span>
+    ├── <span class="d">brief</span>/SKILL.md                 <span class="n">← چی می‌سازیم</span>
+    ├── <span class="d">spec-import</span>/                   <span class="n">← سند شلخته → specs/</span>
+    ├── <span class="d">edges</span>/SKILL.md                 <span class="n">← حالت‌های مرزی</span>
+    ├── <span class="d">plan-check</span>/SKILL.md            <span class="n">← داور پلن، قبل از کد</span>
+    ├── <span class="d">fix-one</span>/SKILL.md               <span class="n">← اصلاح تکی</span>
+    ├── <span class="d">lazy</span>/SKILL.md                  <span class="n">← شدت سخت‌گیری نردبان</span>
+    ├── <span class="d">debt</span>/SKILL.md                  <span class="n">← دفتر میان‌برهای عمدی</span>
+    ├── <span class="d">ctx-audit</span>/SKILL.md             <span class="n">┐</span>
+    ├── <span class="d">ctx-interview</span>/SKILL.md         <span class="n">│</span>
+    ├── <span class="d">ctx-generate</span>/SKILL.md          <span class="n">├ موتور context</span>
+    ├── <span class="d">ctx-verify</span>/SKILL.md            <span class="n">│  (فقط پروژه بزرگ)</span>
+    ├── <span class="d">ctx-learn</span>/SKILL.md             <span class="n">┘</span>
+    ├── <span class="d">audit-codebase</span>/SKILL.md        <span class="n">┐ ممیزی</span>
+    └── <span class="d">find-overengineering</span>/SKILL.md  <span class="n">┘  (فقط پروژه بزرگ)</span></div>
+
+  <div class="note"><p><b>اسم پوشه = اسم دستور.</b> پوشه <code>fix-one</code> می‌شه دستور <code>/fix-one</code>. همین. اسم داخل فایل فقط برچسب نمایشیه.</p></div>
+
+  <h3>خروجی‌ها — داخل هر پروژه</h3>
+  <p>اینا رو تو گیت بذار. تاریخچه تصمیم‌هاتن.</p>
+  <div class="tree">my-project/
+├── <span class="st">PROJECT.md</span>              <span class="n">← /start می‌سازتش</span>
+├── <span class="st">BRIEF.md</span>                <span class="n">← /brief می‌سازتش</span>
+├── <span class="st">CLAUDE.md</span>               <span class="n">← تولیدشده</span>
+├── <span class="st">AUDIT.md</span>                <span class="n">← چک‌لیست باگ‌ها</span>
+├── <span class="st">COMPLEXITY.md</span>           <span class="n">← پیچیدگی اضافه</span>
+└── .claude/
+    ├── <span class="d">rules</span>/               <span class="n">← قوانین محدود به مسیر (تولیدشده)</span>
+    └── <span class="d">ctx</span>/
+        ├── INVENTORY.md    <span class="n">← چی تو کد دیدیم</span>
+        ├── <span class="st">DECISIONS.md</span>     <span class="n">← ★ منبع حقیقت — فقط این رو دستی ویرایش کن</span>
+        └── VERIFY.md       <span class="n">← کدوم قانون واقعاً کار کرد</span></div>
+
+  <div class="note stop"><p><b>مهم‌ترین قانون کل این سیستم:</b> فقط <code>DECISIONS.md</code> رو دستی ویرایش کن. <code>CLAUDE.md</code> و <code>.claude/rules/*</code> تولید می‌شن و دفعه بعد بازنویسی می‌شن.</p></div>
+</section>
+
+<!-- 03 -->
+<section id="tools">
+  <div class="shead"><span class="snum">03</span><h2>ابزارها</h2></div>
+  <p class="sdesc">مربع‌های رنگی بالای هر کارت می‌گن کدوم اندازه پروژه بهش نیاز داره.</p>
+
+  <div class="cards" id="cards">
+
+    <div class="card" data-tiers="1,2,3">
+      <div class="ctop"><span class="cname">/start</span>
+      <span class="pills"><span class="pill p1">1</span><span class="pill p2">2</span><span class="pill p3">3</span></span></div>
+      <p>دو-سه سؤال می‌پرسه، اندازه پروژه رو تعیین می‌کنه، فقط چیزی که لازمه رو راه می‌اندازه.</p>
+      <p class="cwhen"><b>کِی:</b> یک بار، اول هر پروژه</p>
+    </div>
+
+    <div class="card" data-tiers="1,2,3">
+      <div class="ctop"><span class="cname">/next</span>
+      <span class="pills"><span class="pill p1">1</span><span class="pill p2">2</span><span class="pill p3">3</span></span></div>
+      <p>وضعیت پروژه رو می‌خونه و <b>یک کار</b> پیشنهاد می‌ده. اگه پروژه سالمه، می‌گه «هیچی — برو فیچر بعدی».</p>
+      <p class="cwhen"><b>کِی:</b> هر وقت گیج شدی</p>
+    </div>
+
+    <div class="card" data-tiers="2,3">
+      <div class="ctop"><span class="cname">/spec-import</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill p2">2</span><span class="pill p3">3</span></span></div>
+      <p>یه سند brain-dump (ورد / markdown / متن پیست‌شده) رو بین فایل‌های <code>specs/</code> پخش می‌کنه. جای خالی رو <b>حدس نمی‌زنه</b> — فهرست شکاف‌ها می‌ده.</p>
+      <p class="cwhen"><b>کِی:</b> سند محصول از قبل داری، قبل از پر کردن دستی specs</p>
+    </div>
+
+    <div class="card" data-tiers="1,2,3">
+      <div class="ctop"><span class="cname">/brief</span>
+      <span class="pills"><span class="pill p1">1</span><span class="pill p2">2</span><span class="pill p3">3</span></span></div>
+      <p>توضیح شلخته‌ت رو تبدیل می‌کنه به بریف دقیق: ورودی، خروجی، خارج از دامنه، و <b>شرط تمام شدن</b>.</p>
+      <p class="cwhen"><b>کِی:</b> قبل از هر کد جدید</p>
+    </div>
+
+    <div class="card" data-tiers="2,3">
+      <div class="ctop"><span class="cname">/edges</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill p2">2</span><span class="pill p3">3</span></span></div>
+      <p>قبل از کد لیست می‌کنه چی می‌تونه خراب بشه. انتظار داشته باش اکثرشون IGNORE بشن — این عمدیه.</p>
+      <p class="cwhen"><b>کِی:</b> بعد از بریف، قبل از کد</p>
+    </div>
+
+    <div class="card" data-tiers="2,3">
+      <div class="ctop"><span class="cname">/plan-check</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill p2">2</span><span class="pill p3">3</span></span></div>
+      <p>پلن رو در برابر بریف و قوانین سادگی داوری می‌کنه: scope creep، ساختار حدسی، dependency اضافه. خروجی: <b>GO / TRIM / RETHINK</b>.</p>
+      <p class="cwhen"><b>کِی:</b> بعد از plan mode، قبل از کد · <b>حتماً تو سشن تازه</b></p>
+    </div>
+
+    <div class="card" data-tiers="2,3">
+      <div class="ctop"><span class="cname">/fix-one</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill p2">2</span><span class="pill p3">3</span></span></div>
+      <p>دقیقاً یک باگ از گزارش: اول تست شکست‌خورده، بعد اصلاح ریشه، چک دامنه، کامیت، تیک.</p>
+      <p class="cwhen"><b>کِی:</b> بعد از ممیزی · <b>یک مورد در هر جلسه</b></p>
+    </div>
+
+    <div class="card" data-tiers="3">
+      <div class="ctop"><span class="cname">/ctx-audit</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill no">2</span><span class="pill p3">3</span></span></div>
+      <p>کد رو می‌خونه و نقاط تصمیم رو پیدا می‌کنه: سه تا دیت‌پیکر، دو جور فرمت قیمت. <b>قضاوت نمی‌کنه.</b></p>
+      <p class="cwhen"><b>کِی:</b> قدم اول پروژه بزرگ موجود</p>
+    </div>
+
+    <div class="card" data-tiers="3">
+      <div class="ctop"><span class="cname">/ctx-interview</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill no">2</span><span class="pill p3">3</span></span></div>
+      <p>ازت سؤال چندگزینه‌ای می‌پرسه و تصمیم‌هات رو تو <code>DECISIONS.md</code> ثبت می‌کنه.</p>
+      <p class="cwhen"><b>کِی:</b> بعد از ctx-audit · <b>۱۵ دقیقه که کل ارزش سیستم توشه</b></p>
+    </div>
+
+    <div class="card" data-tiers="3">
+      <div class="ctop"><span class="cname">/ctx-generate</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill no">2</span><span class="pill p3">3</span></span></div>
+      <p>از تصمیم‌های تو، <code>CLAUDE.md</code> و فایل‌های قانون می‌سازه. با بودجه سخت‌گیرانه.</p>
+      <p class="cwhen"><b>کِی:</b> بعد از مصاحبه، و هر بار DECISIONS عوض شد</p>
+    </div>
+
+    <div class="card" data-tiers="3">
+      <div class="ctop"><span class="cname">/ctx-verify</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill no">2</span><span class="pill p3">3</span></span></div>
+      <p>تست می‌کنه قوانین واقعاً رفتار رو عوض کردن یا نه. می‌گه کدوم خط رو می‌تونی همین الان پاک کنی.</p>
+      <p class="cwhen"><b>کِی:</b> بعد از هر تولید · <b>این قدم رو رد نکن</b></p>
+    </div>
+
+    <div class="card" data-tiers="3">
+      <div class="ctop"><span class="cname">/ctx-learn</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill no">2</span><span class="pill p3">3</span></span></div>
+      <p>اصلاحاتی که تو سشن کردی رو استخراج می‌کنه و قانون پیشنهاد می‌ده. سیستم از اشتباه واقعی یاد می‌گیره.</p>
+      <p class="cwhen"><b>کِی:</b> آخر سشن‌های جدی</p>
+    </div>
+
+    <div class="card" data-tiers="3">
+      <div class="ctop"><span class="cname">/audit-codebase</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill no">2</span><span class="pill p3">3</span></span></div>
+      <p>پنج پاس جدا: باگ درستی، منطق اشتباه، کد مرده، انحراف از کانونشن، امنیت. چیزی رو تغییر نمی‌ده.</p>
+      <p class="cwhen"><b>کِی:</b> روی یک ماژول، نه کل پروژه یکجا</p>
+    </div>
+
+    <div class="card" data-tiers="2,3">
+      <div class="ctop"><span class="cname">/lazy</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill p2">2</span><span class="pill p3">3</span></span></div>
+      <p>شدت نردبان سادگی: <code>lite</code> · <code>full</code> · <code>ultra</code> · <code>off</code>. سطح رو توی <code>CLAUDE.md</code> می‌نویسه، پس بین سشن‌ها می‌مونه.</p>
+      <p class="cwhen"><b>کِی:</b> وقتی حس کردی داره زیادی می‌سازه — یا زیادی کم</p>
+    </div>
+
+    <div class="card" data-tiers="2,3">
+      <div class="ctop"><span class="cname">/debt</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill p2">2</span><span class="pill p3">3</span></span></div>
+      <p>مارکرهای <code>lazy:</code> رو جمع می‌کنه توی <code>DEBT.md</code> و چک می‌کنه شرط ارتقای هرکدوم فعال شده یا نه.</p>
+      <p class="cwhen"><b>کِی:</b> هر چند اسپرینت · قبل از هر جهش ترافیک</p>
+    </div>
+
+    <div class="card" data-tiers="3">
+      <div class="ctop"><span class="cname">/find-overengineering</span>
+      <span class="pills"><span class="pill no">1</span><span class="pill no">2</span><span class="pill p3">3</span></span></div>
+      <p>اول می‌شماره بعد قضاوت می‌کنه. برای هر مورد <b>دلیل نگه داشتنش</b> رو هم می‌نویسه.</p>
+      <p class="cwhen"><b>کِی:</b> وقتی حس کردی کد داره باد می‌کنه</p>
+    </div>
+
+  </div>
+
+  <div class="note" id="t1note" style="display:none"><p><b>برای اسکریپت یه‌بارمصرف همین سه‌تا کافیه.</b> نه فایل قانون، نه ممیزی، نه موتور context. اگه بعد از دو هفته دیگه بهش دست نمی‌زنی، بیشتر از این لازم نداری — و اضافه کردنش فقط وقتت رو می‌گیره.</p></div>
+
+  <h3>ابزارهای خود Claude Code</h3>
+  <p>اینا رو لازم نیست نصب کنی، از قبل هستن:</p>
+  <div class="tw"><table>
+    <thead><tr><th>دستور</th><th>کار</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Shift+Tab</kbd> دوبار</td><td>plan mode — اول بخونه و نقشه بکشه، بعد کد بزنه</td></tr>
+      <tr><td><code>/verify</code></td><td>بیلد و اجرا می‌کنه تا رفتار واقعی رو تأیید کنه</td></tr>
+      <tr><td><code>/run</code></td><td>اپ رو بالا میاره و راهش می‌بره</td></tr>
+      <tr><td><code>/code-review</code></td><td>بازبینی کد تغییریافته با ایجنت‌های موازی</td></tr>
+      <tr><td><code>/clear</code></td><td>پاک کردن context بین کارهای نامرتبط</td></tr>
+      <tr><td><kbd>Esc Esc</kbd></td><td>برگشت به نقطه قبلی — کد و مکالمه</td></tr>
+      <tr><td><code>/goal</code></td><td>شرط پایان می‌ذاری، تا برقرار شدنش کار می‌کنه</td></tr>
+      <tr><td><code>/memory</code></td><td>ببین کدوم قوانین لود شدن</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 04 -->
+<section id="cycle">
+  <div class="shead"><span class="snum">04</span><h2>نقشه راه استفاده</h2></div>
+  <p class="sdesc">از صفر تا نگهداری، چهار فاز. هیچ فازی رو زودتر از موعدش شروع نکن — پریدن تو فاز ۳ و ۴ دقیقاً همون over-engineeringیه که این جعبه‌ابزار براش ساخته شده.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>فاز</th><th>چی</th><th>ابزار</th><th>کِی</th></tr></thead>
+    <tbody>
+      <tr><td>۰ نصب</td><td>یک بار برای همیشه</td><td><code>bash install.sh</code></td><td>همین الان</td></tr>
+      <tr><td>۱ شروع</td><td>تعیین اندازه و راه‌اندازی حداقلی</td><td><code>/start</code></td><td>یک بار برای هر پروژه</td></tr>
+      <tr><td>۲ چرخه فیچر</td><td><b>قلب سیستم</b> — بریف تا کامیت</td><td><code>/brief</code> → <code>/edges</code>* → plan mode → <code>/plan-check</code>* → کد → تست → <code>/code-review</code></td><td>همیشه، هر فیچر</td></tr>
+      <tr><td>۳ ممیزی</td><td>پیدا کردن باگ و پیچیدگی اضافه</td><td><code>/audit-codebase</code> → <code>/find-overengineering</code> → <code>/fix-one</code> × n</td><td>Tier 2+ · هر چند هفته یا قبل ریلیز</td></tr>
+      <tr><td>۴ موتور context</td><td>قوانین زنده پروژه</td><td><code>ctx-audit → interview → generate → verify</code> · نگهداری با <code>/ctx-learn</code></td><td>فقط Tier 3</td></tr>
+    </tbody>
+  </table></div>
+  <p class="dim">* فقط وقتی لازمه: <code>/edges</code> برای کارِ با لبه واقعی، <code>/plan-check</code> برای پلن غیربدیهی. گم شدی؟ همیشه <code>/next</code>.</p>
+
+  <h3>چرخه فاز ۲ — هر فیچر</h3>
+  <div class="flow">
+    <span class="step">/brief</span><span class="arrow">←</span>
+    <span class="step">/edges</span><span class="arrow">←</span>
+    <span class="step plain">plan mode</span><span class="arrow">←</span>
+    <span class="step">/clear + /plan-check</span><span class="arrow">←</span>
+    <span class="step plain">پیاده‌سازی + تست</span><span class="arrow">←</span>
+    <span class="step">/code-review</span><span class="arrow">←</span>
+    <span class="step plain">کامیت</span><span class="arrow">←</span>
+    <span class="step">/clear</span>
+  </div>
+
+  <div class="tw"><table>
+    <thead><tr><th>قانون عبور</th><th>محرک</th></tr></thead>
+    <tbody>
+      <tr><td>ورود به فاز ۳</td><td>اولین باگِ برگشتی، یا تحویل گرفتن کدی که خودت ننوشتی. نه زودتر.</td></tr>
+      <tr><td>ورود به فاز ۴</td><td>خودت تصمیم نگیر — <code>/next</code> وقتی از آستانه رد شدی (~۶۰ فایل یا نفر دوم) می‌گه.</td></tr>
+      <tr><td>برگشت به عقب</td><td>همیشه مجازه. پروژه Tier 3 هم برای فیکس دو خطی فقط فاز ۲ رو می‌ره.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>چهار لحظه هر کار</h3>
+  <p class="dim">هر کاری — اپ عظیم یا اسکریپت پنجاه خطی — از چهار لحظه رد می‌شه.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>لحظه</th><th>سؤال</th><th>ابزار</th></tr></thead>
+    <tbody>
+      <tr><td>۱. قبل از شروع</td><td>چی می‌سازیم؟</td><td><code>/brief</code></td></tr>
+      <tr><td>۲. قبل از کد</td><td>چطور بنویسیم؟</td><td><code>/edges</code> · plan mode · <code>/plan-check</code> · <code>ctx-*</code></td></tr>
+      <tr><td>۳. حین ساخت</td><td>ثابت کن کار می‌کنه</td><td><code>/verify</code> · تست · <code>/code-review</code></td></tr>
+      <tr><td>۴. بعد از ساخت</td><td>چی خرابه، چی اضافه‌ست</td><td><code>/audit-codebase</code> · <code>/fix-one</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>🟢 اسکریپت اسکرپر — بیست دقیقه</h3>
+  <div class="flow">
+    <span class="step">/start</span><span class="arrow">←</span>
+    <span class="step">/brief</span><span class="arrow">←</span>
+    <span class="step plain">کد + تست واقعی</span><span class="arrow">←</span>
+    <span class="step">/clear</span>
+  </div>
+  <div class="code"><button class="cp">copy</button><pre><span class="k">/start</span>
+   <span class="c">→ Tier 1، هیچ راه‌اندازی‌ای لازم نیست</span>
+
+<span class="k">/brief</span>
+   <span class="s">یه اسکریپت می‌خوام از سایت X قیمت بگیره.</span>
+   <span class="s">ورودی urls.txt، خروجی prices.csv</span>
+   <span class="c">→ چند سؤال → BRIEF.md</span>
+
+<span class="s">BRIEF.md رو پیاده کن. با sample_urls.txt (۳ لینک)</span>
+<span class="s">اجرا کن و خروجی رو نشونم بده.</span></pre></div>
+  <p class="dim">اون جمله آخر مهم‌ترین بخشه. بدون یه چک قابل‌اجرا، «تمام شد» فقط یه حدسه.</p>
+
+  <h3>🟡 افزونه مرورگر</h3>
+  <div class="code"><button class="cp">copy</button><pre><span class="k">/start</span>            <span class="c">→ Tier 2 → CLAUDE.md کوتاه می‌سازه</span>
+<span class="k">/brief</span>            <span class="c">→ BRIEF.md</span>
+<span class="k">/edges</span> <span class="s">"ذخیره تنظیمات کاربر"</span>
+                  <span class="c">→ ۴ تا HANDLE، ۹ تا IGNORE</span>
+
+<span class="p">[Shift+Tab دوبار → plan mode]</span>
+<span class="s">BRIEF.md رو بخون. برای پیاده‌سازی نقشه بکش.</span>
+<span class="c">→ پلن آماده شد. کپیش کن.</span>
+
+<span class="k">/clear</span>
+<span class="k">/plan-check</span>   <span class="s">[پلن رو پیست کن]</span>
+<span class="c">→ VERDICT: TRIM — لایه settings-manager حذف؛ storage خام کافیه</span>
+
+<span class="s">[تو همین سشن تمیز] نقشه اصلاح‌شده رو پیاده کن. تست بنویس. اجرا کن.</span>
+
+<span class="k">/code-review</span>
+<span class="k">/clear</span></pre></div>
+
+  <h3>🔴 اپ موجود — سه هفته</h3>
+  <div class="code"><button class="cp">copy</button><pre><span class="c">── هفته اول: شناخت و قوانین ──</span>
+<span class="k">/start</span>              <span class="c">→ Tier 3</span>
+<span class="k">/ctx-audit</span>          <span class="c">→ INVENTORY.md</span>
+<span class="k">/clear</span>
+<span class="k">/ctx-interview</span>      <span class="c">→ ۱۲ سؤال → DECISIONS.md</span>
+<span class="k">/ctx-generate</span>       <span class="c">→ CLAUDE.md + rules/</span>
+<span class="k">/clear</span>
+<span class="k">/ctx-verify</span>         <span class="c">→ قوانین REDUNDANT رو پاک کن</span>
+
+<span class="c">── هفته دوم: پیدا کردن ──</span>
+<span class="k">/audit-codebase</span> src/features/checkout
+<span class="k">/clear</span>
+<span class="k">/find-overengineering</span> src/features/checkout
+<span class="c">هیچی هنوز عوض نشده. فقط دو چک‌لیست داری.</span>
+
+<span class="c">── هفته سوم: اصلاح، تک‌تک ──</span>
+<span class="k">/next</span>               <span class="c">→ می‌گه کدوم اول</span>
+<span class="k">/clear</span>
+<span class="k">/fix-one</span> AUDIT.md <span class="p">1</span>
+<span class="k">/clear</span>
+<span class="k">/fix-one</span> AUDIT.md <span class="p">2</span></pre></div>
+
+  <div class="note stop"><p><b>هر جلسه اصلاح = دقیقاً یک مورد.</b> نه دو تا، نه «این پنج‌تا شبیه همن». اگه خراب شد باید بدونی کدوم خرابش کرده، و تست سبز باید برای یه چیز مشخص سبز شده باشه.</p></div>
+</section>
+
+<!-- 05 -->
+<section id="reports">
+  <div class="shead"><span class="snum">05</span><h2>گزارش‌ها</h2></div>
+  <p class="sdesc">هر ابزار یه فایل می‌سازه. اینا رو تو گیت بذار.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>فایل</th><th>کی می‌سازتش</th><th>باهاش چیکار کنم</th></tr></thead>
+    <tbody>
+      <tr><td><code>PROJECT.md</code></td><td><code>/start</code></td><td>مرجع. <code>/next</code> می‌خونتش.</td></tr>
+      <tr><td><code>BRIEF.md</code></td><td><code>/brief</code></td><td>قبل از کد بخون. بعد آرشیوش کن.</td></tr>
+      <tr><td><code>INVENTORY.md</code></td><td><code>/ctx-audit</code></td><td>ورودی مصاحبه. یه بار می‌خونیش.</td></tr>
+      <tr><td><code>DECISIONS.md</code> ★</td><td><code>/ctx-interview</code></td><td><b>منبع حقیقت.</b> فقط این رو ویرایش کن.</td></tr>
+      <tr><td><code>VERIFY.md</code></td><td><code>/ctx-verify</code></td><td>REDUNDANTها رو پاک کن، IGNOREها رو درست کن.</td></tr>
+      <tr><td><code>AUDIT.md</code></td><td><code>/audit-codebase</code></td><td>چک‌لیست زنده. <code>/fix-one</code> تیک می‌زنه.</td></tr>
+      <tr><td><code>COMPLEXITY.md</code></td><td><code>/find-overengineering</code></td><td>همون. KEEPها رو دست نزن.</td></tr>
+      <tr><td><code>DEBT.md</code></td><td><code>/debt</code></td><td>همون. بخش Waiting رو دست نزن — هنوز درسته.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>فرمت واحد findingها</h3>
+  <p><code>AUDIT.md</code> و <code>COMPLEXITY.md</code> هر مورد قابل‌اقدام رو دقیقاً به این شکل می‌نویسن — یه قرارداده، نه سلیقه:</p>
+  <div class="code"><button class="cp">copy</button><pre><span class="s">- [ ] #3 BUG src/checkout/total.ts:41 — جمع سبد قبل از اعمال تخفیف گرد می‌شود</span></pre></div>
+  <p class="dim"><code>/next</code> همین چک‌باکس‌ها رو می‌شماره و <code>/fix-one</code> بعد از اصلاح تیک می‌زنه (<code>- [x]</code> + هش کامیت). موردهای KEEP و سؤال‌های باز چک‌باکس نمی‌گیرن — چیزی برای انجام دادن ندارن.</p>
+
+  <h3>از کجا شروع کنم؟ نردبان اولویت</h3>
+  <div class="ladder">
+    <div class="rung r1"><span class="lv">۱ شکسته</span><div><strong>الان کاربر ضرر می‌کنه</strong><span>داده گم می‌شه · رخنه امنیتی · خطای دیده‌شده</span></div></div>
+    <div class="rung r2"><span class="lv">۲ تله</span><div><strong>کار می‌کنه ولی تغییر بعدی رو خراب می‌کنه</strong><span>یه منطق تو دو جا · مرز نامشخص</span></div></div>
+    <div class="rung r3"><span class="lv">۳ کندکننده</span><div><strong>هر فیچر جدید رو کند می‌کنه</strong><span>سه تا دکمه مختلف · بی‌نظمی</span></div></div>
+    <div class="rung r4"><span class="lv">۴ زشتی</span><div><strong>فقط اذیتت می‌کنه</strong><span>نام‌گذاری · ترتیب</span></div></div>
+  </div>
+
+  <div class="note stop"><p><b>قانون سخت:</b> تا پله ۱ و ۲ خالی نشدن، سراغ ۳ نرو. حتی اگه ۳ آسون‌تره — <b>مخصوصاً</b> وقتی آسون‌تره و حس بهتری می‌ده.</p></div>
+  <p>نمی‌دونی از کجا؟ <code>/next</code> بزن. خودش می‌گه کدوم و چرا.</p>
+</section>
+
+<!-- 06 -->
+<section id="update">
+  <div class="shead"><span class="snum">06</span><h2>آپدیت و ارتقا</h2></div>
+  <p class="sdesc">سیستم باید با پروژه رشد کنه، نه اینکه کهنه بشه.</p>
+
+  <h3>الف) قوانین پروژه</h3>
+  <div class="flow">
+    <span class="step plain">DECISIONS.md را ویرایش کن</span><span class="arrow">←</span>
+    <span class="step">/ctx-generate</span><span class="arrow">←</span>
+    <span class="step">/ctx-verify</span>
+  </div>
+  <div class="note stop"><p><b>هیچ‌وقت</b> <code>CLAUDE.md</code> یا <code>.claude/rules/*</code> رو دستی ویرایش نکن — تولیدشده‌ن و دفعه بعد پاک می‌شن. برای همینه که بالاشون نوشته <code>GENERATED — do not hand-edit</code>.</p></div>
+
+  <h3>سه محرک واقعی</h3>
+  <div class="tw"><table>
+    <thead><tr><th>کِی</th><th>چیکار</th></tr></thead>
+    <tbody>
+      <tr><td>آخر سشن‌های جدی</td><td><code>/ctx-learn</code></td></tr>
+      <tr><td><b>دو بار پشت سر هم یه اصلاح تکراری کردی</b></td><td>قانون کهنه شده → <code>DECISIONS.md</code></td></tr>
+      <tr><td>حس کردی داره یه‌جور دیگه می‌زنه</td><td><code>/ctx-verify</code></td></tr>
+    </tbody>
+  </table></div>
+  <p class="dim">اون وسطی مهم‌ترینه. لازم نیست تقویم بذاری — اصطکاک خودش بهت می‌گه.</p>
+  <div class="note"><p><b>تور ایمنی:</b> اگه <code>DECISIONS.md</code> رو ویرایش کردی و <code>/ctx-generate</code> یادت رفت، <code>/next</code> خودش می‌فهمه (تاریخ فایل‌ها رو مقایسه می‌کنه) و همون رو پیشنهاد می‌ده. تصمیمی که regenerate نشده، فقط یه یادداشته.</p></div>
+
+  <h3>ب) ارتقای اندازه پروژه</h3>
+  <p>پروژه کوچیکت بزرگ شده؟ <code>/next</code> خودش می‌گه. بخش <code>Promote when</code> تو <code>PROJECT.md</code> برای همینه — تصمیم رو از قبل گرفتی، نه تو لحظه‌ای که کلافه‌ای.</p>
+  <div class="code"><button class="cp">copy</button><pre><span class="k">/next</span>
+<span class="c">▶ NEXT: /ctx-audit</span>
+<span class="c">  Why: پروژه از ۶۰ فایل رد شد و دو نفر روش کامیت می‌زنن</span></pre></div>
+
+  <h3>ج) خود جعبه‌ابزار</h3>
+  <p>اگه با <code>--link</code> نصب کردی، فایل‌ها رو ویرایش کن — فوراً اعمال می‌شه، ری‌استارت لازم نیست. اگه کپی کردی، دوباره <code>install.sh</code> بزن.</p>
+  <div class="note warn"><p><b>دریفت با نسخه:</b> هر چند ماه یه بار مستندات رسمی رو چک کن. دستورهای بندلی تغییر می‌کنن — مثلاً <code>/simplify</code> تبدیل شد به <code>/code-review</code>. مرجع: <a href="https://code.claude.com/docs/en/skills">code.claude.com/docs/en/skills</a></p></div>
+</section>
+
+<!-- 07 -->
+<section id="trouble">
+  <div class="shead"><span class="snum">07</span><h2>عیب‌یابی</h2></div>
+  <p class="sdesc">مشکلات رایج و علت واقعی‌شون.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>مشکل</th><th>علت معمول</th><th>راه‌حل</th></tr></thead>
+    <tbody>
+      <tr><td>دستور تو منوی <code>/</code> نیست</td><td>پوشه تازه ساخته شده</td><td>یک بار ری‌استارت کن</td></tr>
+      <tr><td>دستور پیدا نمی‌شه</td><td>ساب‌فولدر ساختی</td><td>Claude فقط <b>یک لایه</b> اسکن می‌کنه. ساختار باید تخت باشه.</td></tr>
+      <tr><td>قانون رعایت نمی‌شه</td><td>فایل خیلی بلنده</td><td>هرس کن، بعد <code>/ctx-verify</code></td></tr>
+      <tr><td>قانون لود نمی‌شه</td><td>glob تو کوتیشن نیست</td><td><code>"**/*.ts"</code> ✅ &nbsp; <code>**/*.ts</code> ❌</td></tr>
+      <tr><td>موقع ساخت فایل جدید کار نمی‌کنه</td><td>قوانین path-scoped موقع <b>خوندن</b> فعال می‌شن</td><td>اون خط رو ببر تو <code>CLAUDE.md</code></td></tr>
+      <tr><td>نمی‌دونم چی لود شده</td><td>—</td><td><code>/memory</code></td></tr>
+      <tr><td>هر چی می‌گم اشتباه می‌زنه</td><td>context آلوده به رویکردهای شکست‌خورده</td><td>بعد از دو اصلاح ناموفق: <code>/clear</code> + پرامپت بهتر</td></tr>
+      <tr><td><code>/next</code> می‌گه ۰ مورد باز ولی گزارش پره</td><td>گزارش با فرمت آزاد نوشته شده</td><td>فرمت قرارداده: <code>- [ ] #n SEVERITY file:line</code>. گزارش رو بازتولید کن.</td></tr>
+      <tr><td>نمی‌دونم چرا کار نمی‌کنه</td><td>—</td><td><code>/doctor</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 08 -->
+<section id="rules">
+  <div class="shead"><span class="snum">08</span><h2>قوانین طلایی</h2></div>
+  <p class="sdesc">اگه فقط اینا رو یادت بمونه، ۹۰ درصد فایده رو گرفتی.</p>
+
+  <div class="tw"><table>
+    <tbody>
+      <tr><td style="width:34px;color:var(--cmd);font-family:var(--mono)">01</td><td><b>به Claude راهی بده که کارش رو تأیید کنه.</b> تست، بیلد، اسکرین‌شات. بدون چک قابل‌اجرا، «تمام شد» فقط یه حدسه — و تو می‌شی حلقه تأیید.</td></tr>
+      <tr><td style="color:var(--cmd);font-family:var(--mono)">02</td><td><b><code>/clear</code> بین کارهای نامرتبط.</b> کیفیت با پر شدن context افت می‌کنه.</td></tr>
+      <tr><td style="color:var(--cmd);font-family:var(--mono)">03</td><td><b>بعد از دو اصلاح ناموفق، <code>/clear</code> بزن.</b> سشن تمیز با پرامپت بهتر تقریباً همیشه از سشن طولانیِ پر از اصلاح بهتره.</td></tr>
+      <tr><td style="color:var(--cmd);font-family:var(--mono)">04</td><td><b>هر جلسه اصلاح = یک مورد.</b> نه دو تا.</td></tr>
+      <tr><td style="color:var(--cmd);font-family:var(--mono)">05</td><td><b>پیش‌فرض رو پایین بگیر.</b> بین دو اندازه موندی؟ کوچیک‌تره.</td></tr>
+      <tr><td style="color:var(--cmd);font-family:var(--mono)">06</td><td><b>معیار هر خط قانون:</b> «اگه این رو حذف کنم، Claude اشتباه می‌کنه؟» اگه نه، پاکش کن.</td></tr>
+      <tr><td style="color:var(--cmd);font-family:var(--mono)">07</td><td><b>سه فایل مرجع بهتر از بیست خط توصیفه.</b> مدل از مثال بهتر یاد می‌گیره تا از توصیف.</td></tr>
+      <tr><td style="color:var(--cmd);font-family:var(--mono)">08</td><td><b>هیچ ابزاری نساز تا وقتی دردش رو سه بار حس نکردی.</b></td></tr>
+      <tr><td style="color:var(--cmd);font-family:var(--mono)">09</td><td><b>پلن رو تو همون سشنی که ساختی قضاوت نکن.</b> <code>/clear</code> بزن، بعد <code>/plan-check</code>. سشنی که پلن رو نوشته وکیل پلنه، نه قاضیش.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>مرجع سریع</h3>
+  <div class="code"><button class="cp">copy</button><pre><span class="c">راه‌اندازی      </span><span class="k">/start</span>
+<span class="c">هر روز          </span><span class="k">/next</span>
+<span class="c">قبل از کد       </span><span class="k">/brief</span> → <span class="k">/edges</span> → plan mode → <span class="k">/plan-check</span> <span class="c">(سشن تازه)</span>
+<span class="c">حین کد          </span>پیاده‌سازی → <span class="k">/verify</span> → <span class="k">/code-review</span>
+<span class="c">بعد از کد       </span><span class="k">/audit-codebase</span> → <span class="k">/fix-one</span> <span class="c">(تکرار)</span>
+<span class="c">پروژه بزرگ      </span><span class="k">/ctx-audit</span> → <span class="k">/ctx-interview</span> → <span class="k">/ctx-generate</span> → <span class="k">/ctx-verify</span>
+<span class="c">آخر سشن         </span><span class="k">/ctx-learn</span>
+<span class="c">گیر کردی        </span><span class="k">/doctor</span> · <span class="k">/memory</span> · <span class="k">/context</span> · <span class="k">/skills</span></pre></div>
+</section>
+
+<footer>
+  <p>جعبه‌ابزار Claude Code · مستندات رسمی: <a href="https://code.claude.com/docs/en/best-practices">code.claude.com/docs</a></p>
+</footer>
+
+</main>
+</div>
+</div>
+
+<script>
+(function(){
+  // ---- tier filter (the signature interaction) ----
+  var btns  = document.querySelectorAll('.tier');
+  var cards = document.querySelectorAll('#cards .card');
+  var count = document.getElementById('count');
+  var t1note= document.getElementById('t1note');
+
+  function apply(t){
+    var shown = 0;
+    cards.forEach(function(c){
+      var ok = (t === 'all') || c.dataset.tiers.split(',').indexOf(t) !== -1;
+      c.classList.toggle('off', !ok);
+      if (ok) shown++;
+    });
+    count.innerHTML = '<b>' + shown + '</b> / ' + cards.length + ' tools';
+    t1note.style.display = (t === '1') ? '' : 'none';
+  }
+
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      btns.forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+      apply(b.dataset.t);
+    });
+  });
+
+  // ---- copy buttons ----
+  document.querySelectorAll('.cp').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var txt = btn.parentElement.querySelector('pre').innerText;
+      var done = function(){
+        btn.textContent = 'copied'; btn.classList.add('done');
+        setTimeout(function(){ btn.textContent='copy'; btn.classList.remove('done'); }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(done, function(){});
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = txt; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch(e){}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+
+  // ---- nav highlight ----
+  var links = document.querySelectorAll('nav a');
+  var secs  = document.querySelectorAll('main section');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting) {
+          links.forEach(function(l){
+            l.classList.toggle('on', l.getAttribute('href') === '#' + e.target.id);
+          });
+        }
+      });
+    }, { rootMargin: '-90px 0px -70% 0px' });
+    secs.forEach(function(s){ io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>
