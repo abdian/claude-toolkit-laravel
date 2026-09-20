@@ -3,8 +3,8 @@
 #  Claude Code toolkit installer
 #
 #  Usage:  bash install.sh                  → starter 6, into THIS project
-#          bash install.sh --all            → all 17, into THIS project
-#          bash install.sh --all --global   → all 17, into ~/.claude/skills
+#          bash install.sh --all            → all 18, into THIS project
+#          bash install.sh --all --global   → all 18, into ~/.claude/skills
 #          bash install.sh --all --copy     → real copies instead of symlinks
 #          bash install.sh --all --force    → overwrite what's already there
 #
@@ -26,7 +26,7 @@ SRC="$HERE/skills"
 ROOT="$(dirname "$HERE")"          # the workspace/project dir holding this toolkit
 
 STARTER=(start next brief plan-check fix-one lazy)
-REST=(edges debt spec-import explain ctx-audit ctx-interview ctx-generate ctx-verify ctx-learn audit-codebase find-overengineering)
+REST=(edges debt spec-import explain security-review ctx-audit ctx-interview ctx-generate ctx-verify ctx-learn audit-codebase find-overengineering)
 
 SET=("${STARTER[@]}")
 SCOPE="project"; MODE="link"; FORCE="no"

@@ -4,11 +4,11 @@
 
 **Decide before you build. Verify before you ship.**
 
-17 Claude Code skills, a product-spec starter, and Laravel-shaped rules —
+18 Claude Code skills, a product-spec starter, and Laravel-shaped rules —
 so the agent knows *what* to build and *how you'd know it worked*.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-7E90AC.svg)](LICENSE)
-![Skills](https://img.shields.io/badge/skills-17-56D98B.svg)
+![Skills](https://img.shields.io/badge/skills-18-56D98B.svg)
 ![Version](https://img.shields.io/badge/version-1.7--laravel-F2B544.svg)
 
 **English** · [فارسی](README.fa.md)
@@ -147,7 +147,7 @@ Then, inside Claude Code:
 
 ```bash
 bash install.sh                  # starter 6, into THIS project
-bash install.sh --all            # all 17
+bash install.sh --all            # all 18
 bash install.sh --all --global   # into ~/.claude/skills instead
 bash install.sh --all --copy     # real copies instead of symlinks
 bash install.sh --all --force    # overwrite what's already there
@@ -385,10 +385,10 @@ Measured on this repo, not estimated:
 
 | | Tokens | When |
 |---|---|---|
-| All 17 skill descriptions | **≈ 780** | every message, cached |
+| All 18 skill descriptions | **≈ 780** | every message, cached |
 | `CLAUDE.laravel.md` template | ≈ 3,800 | every message, cached |
 | One skill body | 630 – 1,900 | only when you call it |
-| All 17 bodies at once | ≈ 18,400 | never happens in practice |
+| All 18 bodies at once | ≈ 18,400 | never happens in practice |
 
 A phase costs **under 2,000 tokens** to run. The mistake it's there to prevent —
 a feature built on a decision nobody made, then re-read, argued about and
@@ -400,7 +400,7 @@ drifted, which is exactly what `/clear` between phases exists to stop.
 
 ---
 
-## The 17 skills
+## The 18 skills
 
 Every skill is `disable-model-invocation: true` — it runs **only when you ask**,
 never on the model's initiative.
@@ -442,6 +442,7 @@ Tiers exist so small projects don't get big-project ceremony:
 | `/lazy [lite\|full\|ultra\|off]` | Sets how hard the simplicity ladder is enforced |
 | `/fix-one <report> <n>` | ⭐ Fixes exactly one finding |
 | `/explain [commit\|--staged]` | Explains what changed and why, as an HTML report — and flags what nothing asked for |
+| `/security-review [path]` | Audits for exploitable defects — every finding names who can reach it and how |
 
 `/fix-one` is the strictest contract here — six mandatory steps:
 
@@ -483,6 +484,38 @@ that asked for it — a line in `BRIEF.md`, a numbered finding, a row in
 A clean audit is a real result — if the diff is minimal and everything traces,
 it says so.
 
+### Security — three layers, not one command
+
+Security cannot be a skill you remember to invoke, because the moment you needed
+it has already passed. It sits in three places:
+
+| When | What | Always on? |
+|---|---|---|
+| **Planning** | `/plan-check` step 6 — a step that crosses a trust boundary must already name who may reach it, what validates the shape, and what shape leaves | you run it |
+| **Writing** | **Trust boundaries** section in `CLAUDE.laravel.md` — the only always-on layer | ✅ yes |
+| **Reviewing** | `/security-review` — a Laravel-shaped audit, `/fix-one` compatible | you run it |
+
+The write-time layer is deliberately in the template rather than in a skill, and
+it carries one rule that overrides everything else here:
+
+> **The ladder makes code smaller. It never makes a boundary thinner.**
+> Trust-boundary rules hold even under `/lazy ultra`.
+
+`/security-review` is built around one discipline: **every finding names who can
+reach it and through what request.** No reachable path means it is not a
+finding — it goes in HARDENING instead. That is what stops a security report
+from turning into forty speculative lines nobody reads.
+
+It looks where Laravel apps actually break, in order: missing Policies, IDOR
+through route model binding, mass assignment as privilege escalation, then
+injection where the framework was stepped around (`whereRaw`, `{!! !!}`,
+`->orderBy($request->sort)`), then uploads, sessions, what leaks (API Resources
+returning whole models, secrets in queue payloads), and finally unverified
+webhook signatures.
+
+> It is a code read, not a penetration test, and it does not replace one for
+> anything handling money or identity. The skill says so in its own output.
+
 ### Context engine — Tier 3 only
 
 `/ctx-audit` → `/ctx-interview` → `/ctx-generate` → `/ctx-verify` → `/ctx-learn`
@@ -516,7 +549,7 @@ every few weeks:  /audit-codebase → /clear → /find-overengineering → /debt
 claude-toolkit-laravel/
 ├── install.sh · install.ps1     project-scoped installer, bash + PowerShell
 ├── docx2md.py                   .docx → markdown, stdlib only
-├── skills/                      17 skills
+├── skills/                      18 skills
 ├── templates/                   CLAUDE.md · CLAUDE.laravel.md · settings.json
 ├── specs/                       product-spec starter (13 files)
 ├── docs/

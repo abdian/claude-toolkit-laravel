@@ -59,6 +59,17 @@ the tab mid-write · a retry arriving after the original succeeded
 not logged in · logged in but not allowed · was allowed, no longer is ·
 someone else's record
 
+**Someone doing it on purpose**
+Not the careless user — the one probing. Changing the id in the URL to a record
+they do not own · posting a field the form never showed (`role`, `is_admin`,
+`price`) · replaying a webhook · calling the endpoint without the frontend ·
+sending a filename that walks the path · uploading a file whose extension and
+contents disagree · hammering the OTP endpoint.
+
+These rarely end up in **Ignore**. If one does, the reason has to be a control
+that already exists — a Policy, a FormRequest, a signature check — named
+explicitly. "Unlikely" is not a reason here.
+
 ## Output
 
 ```markdown

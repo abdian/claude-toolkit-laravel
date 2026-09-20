@@ -183,6 +183,56 @@ In replies to me:
   a skill whose contract is a document — is not debt. Give that in full. This
   rule is only against prose nobody asked for.
 
+## Trust boundaries — IMPORTANT
+
+A trust boundary is any point where data you did not create enters code you
+control: an HTTP request, a webhook, a queue payload, a file upload, a response
+from an external service. **These rules are not subject to the ladder.** The
+ladder makes code smaller; it never makes a boundary thinner.
+
+Before writing code that touches one, answer these four in the reply — not in a
+comment, and not later:
+
+1. **Who can reach this?** Guest, any authenticated user, or a specific role.
+   "The frontend only calls it after checking" is not an answer — the frontend
+   is not a boundary.
+2. **What proves they may?** Name the Policy method or Gate. If there is none,
+   the answer is "nothing", and that is the first thing to build.
+3. **What proves the input is shaped as expected?** Name the FormRequest.
+4. **What leaves?** Name the API Resource. If a model is being returned
+   directly, that is the finding.
+
+Then these, always:
+
+- **Never `$request->all()` into a model.** `update($request->all())` with a
+  permissive `$fillable` is privilege escalation, not a shortcut. Pass the
+  validated array, field by field where it matters.
+- **`$guarded = []` is forbidden** on any model with a role, permission,
+  balance, status, or ownership column.
+- **Authorize against the record, not the id.** A bound model resolves any row.
+  Ownership belongs in the Policy or in a scoped query — never in an `if` added
+  after the fact, which the next edit will drop.
+- **Stay inside the framework's escaping.** `whereRaw`, `orderByRaw`,
+  `DB::raw`, `{!! !!}` need a written reason. `->orderBy($request->sort)` is
+  column injection even though it reads as harmless.
+- **Rate-limit anything that costs money or sends a message** — login, OTP
+  request, OTP verify, password reset. An unthrottled SMS endpoint is a bill
+  and a hole at once.
+- **Compare secrets with `hash_equals`**, never `==`.
+- **Verify inbound webhook signatures before reading the body.** A payment
+  callback without verification lets anyone mark an order paid.
+- **Every outbound `Http::` call gets a `timeout()`.** No timeout means a hung
+  worker under someone else's outage.
+- **Nothing sensitive in logs or queue payloads.** A Job serialises its
+  constructor arguments to Redis; a secret passed in is a secret at rest.
+  National id, phone, address and card data never reach `Log::`.
+- **Uploads:** validate mime *and* extension, generate the filename yourself,
+  store under `storage/` behind a signed URL, cap the size. Treat SVG as
+  executable.
+
+When you genuinely cannot satisfy one of these, **say so and stop** — do not
+build the feature with the gap in it and mention it afterwards.
+
 ## Laravel conventions
 
 - Validation lives in **FormRequest** classes. Never inline `$request->validate`

@@ -32,7 +32,7 @@
 
   <!-- row 1 — this toolkit -->
   <text x="72" y="212" font-family="Georgia,serif" font-size="19" font-weight="bold" fill="#F1EADD">claude-toolkit-laravel</text>
-  <text x="72" y="232" font-family="Consolas,monospace" font-size="12" fill="#6A6153">17 skills · this repo</text>
+  <text x="72" y="232" font-family="Consolas,monospace" font-size="12" fill="#6A6153">18 skills · this repo</text>
   <rect x="340" y="192" width="856" height="44" rx="4" fill="#211710" stroke="#E24E3A" stroke-width="2"/>
   <text x="768" y="219" font-family="Consolas,monospace" font-size="13" fill="#C6BCAB" text-anchor="middle">/spec-import · /brief · /edges · /plan-check · /audit-codebase · /fix-one</text>
 

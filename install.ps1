@@ -2,8 +2,8 @@
   Claude Code toolkit installer — Windows / PowerShell
 
   Usage:  .\install.ps1                  -> starter 6, into THIS project
-          .\install.ps1 -All             -> all 17, into THIS project
-          .\install.ps1 -All -Global     -> all 17, into ~\.claude\skills
+          .\install.ps1 -All             -> all 18, into THIS project
+          .\install.ps1 -All -Global     -> all 18, into ~\.claude\skills
           .\install.ps1 -All -Copy       -> real copies instead of symlinks
           .\install.ps1 -All -Force      -> overwrite what's already there
 
@@ -40,7 +40,7 @@ $Src  = Join-Path $Here 'skills'
 $Root = Split-Path -Parent $Here     # the project dir holding this toolkit
 
 $Starter = @('start','next','brief','plan-check','fix-one','lazy')
-$Rest    = @('edges','debt','spec-import','explain','ctx-audit','ctx-interview',
+$Rest    = @('edges','debt','spec-import','explain','security-review','ctx-audit','ctx-interview',
              'ctx-generate','ctx-verify','ctx-learn','audit-codebase',
              'find-overengineering')
 

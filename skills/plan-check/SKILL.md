@@ -49,7 +49,17 @@ transiently fail.
 or fewer layers? Sketch the smaller shape in two or three lines. If nothing
 smaller would work, say so plainly — that is a finding too.
 
-**6. The missing piece** — the one realistic failure or edge case the plan
+**6. Trust boundaries** — does any step take input from a request, a webhook, a
+queue payload, an upload, or an external service? For each one the plan must
+already name three things: **who is allowed**, **what validates the shape**,
+and **what shape leaves**. A step that crosses a boundary and names none of
+them is not an under-specified step — it is the plan's most likely security
+bug, and it is cheaper to answer here than after the code exists.
+
+This check runs even under `/lazy ultra`. The ladder makes code smaller; it
+never makes a boundary thinner.
+
+**7. The missing piece** — the one realistic failure or edge case the plan
 does not mention. Exactly one. Naming ten is hedging, not reviewing.
 
 ## Verdict
